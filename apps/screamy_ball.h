@@ -1,4 +1,4 @@
-// Copyright (c) 2020 CS126SP20. All rights reserved.
+// Copyright (c) 2020 Ishita Rao. All rights reserved.
 
 #ifndef FINALPROJECT_APPS_SCREAMYBALL_H_
 #define FINALPROJECT_APPS_SCREAMYBALL_H_
@@ -6,17 +6,30 @@
 #include <cinder/app/App.h>
 #include <sphinx/Recognizer.hpp>
 
-namespace screamy_ball {
+namespace screamyball_app {
 
-class MyApp : public cinder::app::App {
+enum class GameState {
+  kPlaying,
+  kGameOver,
+};
+
+class ScreamyBall : public cinder::app::App {
  public:
-  MyApp();
+  ScreamyBall();
   void setup() override;
   void update() override;
   void draw() override;
   void keyDown(cinder::app::KeyEvent) override;
+
+ private:
+  void DrawGameOver();
+
+
+ private:
+  bool printed_game_over_;
+  bool paused_;
 };
 
-}  // namespace screamy_ball
+}  // namespace screamyball_app
 
 #endif  // FINALPROJECT_APPS_SCREAMYBALL_H_

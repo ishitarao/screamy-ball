@@ -1,4 +1,4 @@
-// Copyright (c) 2020 [Your Name]. All rights reserved.
+// Copyright (c) 2020 Ishita Rao. All rights reserved.
 
 #include <cinder/app/App.h>
 #include <cinder/app/RendererGl.h>
@@ -9,7 +9,7 @@ using cinder::app::App;
 using cinder::app::RendererGl;
 
 
-namespace screamy_ball {
+namespace screamyball_app {
 
 const int kSamples = 8;
 const int kWidth = 800;
@@ -20,10 +20,10 @@ void SetUp(App::Settings* settings) {
   settings->setTitle("My CS 126 Application");
 }
 
-}  // namespace screamy_ball
+}  // namespace screamyball_app
 
 
 // This is a macro that runs the application.
-CINDER_APP(screamy_ball::MyApp,
-           RendererGl(RendererGl::Options().msaa(screamy_ball::kSamples)),
-           screamy_ball::SetUp)
+CINDER_APP(screamyball_app::ScreamyBall,
+           RendererGl(RendererGl::Options().msaa(screamyball_app::kSamples)),
+           screamyball_app::SetUp)
