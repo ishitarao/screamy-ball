@@ -1,0 +1,4 @@
+# See: https://google.github.io/styleguide/cppguide.html
+---
+BasedOnStyle: Google
+UseTab: Never
