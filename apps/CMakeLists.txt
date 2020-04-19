@@ -9,19 +9,19 @@ file(GLOB SOURCE_LIST CONFIGURE_DEPENDS
 
 
 ci_make_app(
-    APP_NAME    cinder-myapp
+    APP_NAME    cinder-screamy-ball
     CINDER_PATH ${CINDER_PATH}
     SOURCES     ${SOURCE_LIST}
     LIBRARIES   mylibrary
-    BLOCKS
+    BLOCKS      ciSpeech
 )
 
-target_compile_features(cinder-myapp PRIVATE cxx_std_14)
+target_compile_features(cinder-screamy-ball PRIVATE cxx_std_14)
 
 # Cross-platform compiler lints
 if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang"
         OR CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-    target_compile_options(cinder-myapp PRIVATE
+    target_compile_options(cinder-screamy-ball PRIVATE
             -Wall
             -Wextra
             -Wswitch
@@ -34,6 +34,6 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang"
             -pedantic-errors)
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     cmake_policy(SET CMP0015 NEW)
-    target_compile_options(cinder-myapp PRIVATE
+    target_compile_options(cinder-screamy-ball PRIVATE
             /W3)
 endif ()

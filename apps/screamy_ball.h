@@ -1,12 +1,12 @@
 // Copyright (c) 2020 CS126SP20. All rights reserved.
 
-#ifndef FINALPROJECT_APPS_MYAPP_H_
-#define FINALPROJECT_APPS_MYAPP_H_
+#ifndef FINALPROJECT_APPS_SCREAMYBALL_H_
+#define FINALPROJECT_APPS_SCREAMYBALL_H_
 
 #include <cinder/app/App.h>
+#include <sphinx/Recognizer.hpp>
 
-
-namespace myapp {
+namespace screamy_ball {
 
 class MyApp : public cinder::app::App {
  public:
@@ -17,6 +17,6 @@ class MyApp : public cinder::app::App {
   void keyDown(cinder::app::KeyEvent) override;
 };
 
-}  // namespace myapp
+}  // namespace screamy_ball
 
-#endif  // FINALPROJECT_APPS_MYAPP_H_
+#endif  // FINALPROJECT_APPS_SCREAMYBALL_H_

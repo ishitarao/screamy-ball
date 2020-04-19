@@ -1,11 +1,11 @@
 // Copyright (c) 2020 [Your Name]. All rights reserved.
 
-#include "my_app.h"
+#include "screamy_ball.h"
 
 #include <cinder/app/App.h>
 
 
-namespace myapp {
+namespace screamy_ball {
 
 using cinder::app::KeyEvent;
 
@@ -19,4 +19,4 @@ void MyApp::draw() { }
 
 void MyApp::keyDown(KeyEvent event) { }
 
-}  // namespace myapp
+}  // namespace screamy_ball
