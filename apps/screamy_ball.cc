@@ -36,16 +36,48 @@ const char kDifferentFont[] = "Papyrus";
 
 ScreamyBall::ScreamyBall()
     : printed_game_over_{false},
-      paused_{false} { }
+      paused_{false},
+      state_{GameState::kPlaying} { }
 
 void ScreamyBall::setup() {
   cinder::gl::enableDepthWrite();
   cinder::gl::enableDepthRead();
+  timer_.start();
 }
 
-void ScreamyBall::update() { }
+string PrettyPrintElapsedTime(double time_secs) {
+  int seconds = (int)time_secs;
 
-void ScreamyBall::draw() { }
+  int hours = seconds / (60 * 60);
+  seconds -= hours * (60 * 60);
+
+  int minutes = seconds / 60;
+  seconds -= minutes * 60;
+
+  std::stringstream sstream;
+  sstream << hours << ':' << minutes << ':' << seconds;
+  return sstream.str();
+}
+
+void ScreamyBall::update() {
+  if (state_ == GameState::kGameOver) {
+    timer_.stop();
+  }
+}
+
+void ScreamyBall::draw() {
+  cinder::gl::enableAlphaBlending();
+
+  if (state_ == GameState::kGameOver) {
+    if (!printed_game_over_) {
+      cinder::gl::clear(Color::black());
+    }
+    DrawGameOver();
+    return;
+  }
+
+  if (paused_) return;
+}
 
 template <typename C>
 void PrintText(const string& text, const C& color, const cinder::ivec2& size,
@@ -74,8 +106,9 @@ void ScreamyBall::DrawGameOver() {
   const cinder::vec2 center = getWindowCenter();
   const cinder::ivec2 size = {500, 50};
   const Color color = Color::white();
-
+  string elapsed_time = PrettyPrintElapsedTime(timer_.getSeconds());
   PrintText("Game Over :(", color, size, center);
+  PrintText("Your time: " + elapsed_time, color, size, center);
 
   printed_game_over_ = true;
 }

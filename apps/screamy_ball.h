@@ -4,6 +4,7 @@
 #define FINALPROJECT_APPS_SCREAMYBALL_H_
 
 #include <cinder/app/App.h>
+#include <cinder/Timer.h>
 #include <sphinx/Recognizer.hpp>
 
 namespace screamyball_app {
@@ -28,6 +29,8 @@ class ScreamyBall : public cinder::app::App {
  private:
   bool printed_game_over_;
   bool paused_;
+  GameState state_;
+  cinder::Timer timer_;
 };
 
 }  // namespace screamyball_app
