@@ -77,6 +77,11 @@ void ScreamyBall::draw() {
   }
 
   if (paused_) return;
+
+  cinder::gl::clear(Color::black());
+  DrawBall();
+  DrawObstacles();
+
 }
 
 template <typename C>
@@ -113,6 +118,13 @@ void ScreamyBall::DrawGameOver() {
   printed_game_over_ = true;
 }
 
+void ScreamyBall::DrawBall() {
+
+}
+void ScreamyBall::DrawObstacles() {
+
+}
+
 void ScreamyBall::keyDown(KeyEvent event) {
   switch (event.getCode()) {
     case KeyEvent::KEY_UP:
@@ -143,6 +155,27 @@ void ScreamyBall::keyDown(KeyEvent event) {
       ResetGame();
       break;
     }
-  }}
+  }
+}
+
+bool ScreamyBall::ConfirmReset() {
+  const cinder::vec2 center = getWindowCenter();
+  const cinder::ivec2 size = {500, 50};
+  const Color color = Color::white();
+  PrintText("Do you really want to reset the game?", color, size, center);
+
+  return false;
+}
+
+void ScreamyBall::ResetGame() {
+  if (!ConfirmReset()) return;
+  //engine_.Reset();
+  paused_ = false;
+  printed_game_over_ = false;
+  state_ = GameState::kPlaying;
+  //time_left_ = 0;
+  //top_players_.clear();
+  //current_player_top_scores_.clear();
+}
 
 }  // namespace screamyball_app

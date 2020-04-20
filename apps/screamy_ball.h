@@ -24,6 +24,10 @@ class ScreamyBall : public cinder::app::App {
 
  private:
   void DrawGameOver();
+  void ResetGame();
+  bool ConfirmReset();
+  void DrawBall();
+  void DrawObstacles();
 
 
  private:
