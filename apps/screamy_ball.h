@@ -34,9 +34,14 @@ class ScreamyBall : public cinder::app::App {
 
  private:
   screamy_ball::Engine engine_;
+  GameState state_;
   bool printed_game_over_;
   bool paused_;
-  GameState state_;
+  int tile_size_;
+  int height_;
+  int width_;
+  int delay_secs_;
+  double last_time_;
   cinder::Timer timer_;
   cinder::params::InterfaceGlRef params_;
 

@@ -13,6 +13,6 @@
   - Added an enum representing the ball state
   - Need to do (for today and tomorrow):
     - [ ] Draw the ball normally and when ducking
-    - [ ] Add more logic to the engine
-    - [ ] Add logic for when the user presses a key
+    - [x] Add more logic to the engine
+    - [x] Add logic for when the user presses a key
 ---

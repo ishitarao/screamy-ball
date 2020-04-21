@@ -18,7 +18,7 @@ namespace screamyball_app {
 DEFINE_uint32(width, 16, "the number of tiles in each row");
 DEFINE_uint32(height, 16, "the number of tiles in each column");
 DEFINE_uint32(tilesize, 50, "the size of each tile");
-DEFINE_uint32(speed, 70, "the speed (delay) of the game");
+DEFINE_double(delay_secs, 0.7, "the delay (in seconds) of the game");
 
 const int kSamples = 8;
 const int kWidth = 800;

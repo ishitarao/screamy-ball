@@ -37,12 +37,17 @@ const char kDifferentFont[] = "Papyrus";
 DECLARE_uint32(width);
 DECLARE_uint32(height);
 DECLARE_uint32(tilesize);
-DECLARE_uint32(speed);
+DECLARE_double(delay_secs);
 
 ScreamyBall::ScreamyBall()
     : printed_game_over_{false},
       paused_{false},
-      state_{GameState::kPlaying} { }
+      state_{GameState::kPlaying},
+      tile_size_(FLAGS_tilesize),
+      height_(FLAGS_height),
+      width_(FLAGS_width),
+      delay_secs_(FLAGS_delay_secs),
+      last_time_(0.00) {}
 
 void ScreamyBall::setup() {
   cinder::gl::enableDepthWrite();
@@ -73,6 +78,12 @@ void ScreamyBall::update() {
   if (state_ == GameState::kGameOver) {
     timer_.stop();
   }
+  const double current_time = timer_.getSeconds();
+  if (current_time - last_time_ > delay_secs_) {
+    engine_.Roll();
+    last_time_ = current_time;
+  }
+
 }
 
 void ScreamyBall::draw() {
@@ -144,9 +155,12 @@ void ScreamyBall::DrawObstacles() {
  *  Maybe we can randomize their appearance.
  *
  */
+
+
 }
 
 void ScreamyBall::keyDown(KeyEvent event) {
+  // down key needs to be held down for ball to remain ducking
   switch (event.getCode()) {
     case KeyEvent::KEY_UP:
     case KeyEvent::KEY_k:
@@ -164,11 +178,6 @@ void ScreamyBall::keyDown(KeyEvent event) {
     case KeyEvent::KEY_p: {
       paused_ = !paused_;
 
-//      if (paused_) {
-//        last_pause_time_ = system_clock::now();
-//      } else {
-//        last_intact_time_ += system_clock::now() - last_pause_time_;
-//      }
       break;
     }
     case KeyEvent::KEY_r: {
