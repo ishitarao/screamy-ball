@@ -5,6 +5,8 @@
 
 namespace screamy_ball {
 
+Location::Location() : row_(0), col_(0) {}
+
 Location::Location(int row, int col) : row_(row), col_(col) {}
 
 bool Location::operator==(const Location& rhs) const {

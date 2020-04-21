@@ -1,7 +1,7 @@
 // Copyright (c) 2020 CS126SP20. All rights reserved.
 
-#ifndef SNAKE_LOCATION_H_
-#define SNAKE_LOCATION_H_
+#ifndef FINALPROJECT_INCLUDE_SCREAMY_BALL_LOCATION_H_
+#define FINALPROJECT_INCLUDE_SCREAMY_BALL_LOCATION_H_
 
 #include <cstddef>
 #include <iostream>
@@ -11,6 +11,7 @@ namespace screamy_ball {
 // Represents a location on the board.
 class Location {
  public:
+  Location();
   Location(int row, int col);
 
   // Comparison operators.
@@ -41,7 +42,7 @@ class Location {
 
 std::ostream& operator<<(std::ostream& os, const Location& location);
 
-}  // namespace snake
+}  // namespace screamy_ball
 
 
-#endif  // SNAKE_LOCATION_H_
+#endif  // FINALPROJECT_INCLUDE_SCREAMY_BALL_LOCATION_H_

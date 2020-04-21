@@ -8,8 +8,8 @@
 #include <cinder/Vector.h>
 #include <cinder/gl/draw.h>
 #include <cinder/gl/gl.h>
+#include <gflags/gflags.h>
 
-#include <screamy-ball/direction.h>
 
 namespace screamyball_app {
 
@@ -17,7 +17,7 @@ using cinder::Color;
 using cinder::ColorA;
 using cinder::TextBox;
 using cinder::app::KeyEvent;
-using screamy_ball::Direction;
+using screamy_ball::BallState;
 using std::string;
 
 #if defined(CINDER_COCOA_TOUCH)
@@ -34,6 +34,11 @@ const char kBoldFont[] = "Arial Bold";
 const char kDifferentFont[] = "Papyrus";
 #endif
 
+DECLARE_uint32(width);
+DECLARE_uint32(height);
+DECLARE_uint32(tilesize);
+DECLARE_uint32(speed);
+
 ScreamyBall::ScreamyBall()
     : printed_game_over_{false},
       paused_{false},
@@ -43,6 +48,11 @@ void ScreamyBall::setup() {
   cinder::gl::enableDepthWrite();
   cinder::gl::enableDepthRead();
   timer_.start();
+
+  // Create the interface and give it a name.
+  params_ = cinder::params::InterfaceGl::create( getWindow(),
+      "App parameters",
+      cinder::app::toPixels( cinder::ivec2( 200, 400 ) ) );
 }
 
 string PrettyPrintElapsedTime(double time_secs) {
@@ -86,7 +96,8 @@ void ScreamyBall::draw() {
 
 template <typename C>
 void PrintText(const string& text, const C& color, const cinder::ivec2& size,
-               const cinder::vec2& loc) {
+               const cinder::vec2& loc,
+               const ColorA& bg_color = ColorA::zero()) {
   cinder::gl::color(color);
 
   auto box = TextBox()
@@ -94,7 +105,7 @@ void PrintText(const string& text, const C& color, const cinder::ivec2& size,
       .font(cinder::Font(kNormalFont, 30))
       .size(size)
       .color(color)
-      .backgroundColor(ColorA(0, 0, 0, 0))
+      .backgroundColor(bg_color)
       .text(text);
 
   const auto box_size = box.getSize();
@@ -122,7 +133,17 @@ void ScreamyBall::DrawBall() {
 
 }
 void ScreamyBall::DrawObstacles() {
-
+/*
+ * If there's no obstacle on the screen, then create an obstacle.
+ * If there's an obstacle on the screen, don't create a new obstacle.
+ *  However, do make it change its position to be closer to the ball.
+ *  Also, you can create obstacles of multiple sizes.
+ *
+ *  There should be two types of obstacles: high and low.
+ *  You have to jump over the high ones and duck beneath the low ones.
+ *  Maybe we can randomize their appearance.
+ *
+ */
 }
 
 void ScreamyBall::keyDown(KeyEvent event) {
@@ -130,13 +151,13 @@ void ScreamyBall::keyDown(KeyEvent event) {
     case KeyEvent::KEY_UP:
     case KeyEvent::KEY_k:
     case KeyEvent::KEY_w: {
-      //engine_.SetDirection(Direction::kUp);
+      engine_.state_ = BallState::kJumping;
       break;
     }
     case KeyEvent::KEY_DOWN:
     case KeyEvent::KEY_j:
     case KeyEvent::KEY_s: {
-      //engine_.SetDirection(Direction::kDown);
+      engine_.state_ = BallState::kDucking;
       break;
     }
 
@@ -161,15 +182,17 @@ void ScreamyBall::keyDown(KeyEvent event) {
 bool ScreamyBall::ConfirmReset() {
   const cinder::vec2 center = getWindowCenter();
   const cinder::ivec2 size = {500, 50};
-  const Color color = Color::white();
-  PrintText("Do you really want to reset the game?", color, size, center);
+  const Color color = Color::black();
+  const ColorA bg_color = ColorA::gray(0.5);
+  PrintText("Do you really want to reset the game?", color, size, center,
+      bg_color);
 
   return false;
 }
 
 void ScreamyBall::ResetGame() {
   if (!ConfirmReset()) return;
-  //engine_.Reset();
+  engine_.Reset();
   paused_ = false;
   printed_game_over_ = false;
   state_ = GameState::kPlaying;

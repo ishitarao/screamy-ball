@@ -4,4 +4,11 @@
 
 namespace screamy_ball {
 
+void Engine::Roll() {
+
+}
+
+void Engine::Reset() {
+  state_ = BallState::kRolling;
+}
 }  // namespace screamy-ball

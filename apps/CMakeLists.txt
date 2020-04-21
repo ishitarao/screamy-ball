@@ -12,7 +12,7 @@ ci_make_app(
     APP_NAME    cinder-screamy-ball
     CINDER_PATH ${CINDER_PATH}
     SOURCES     ${SOURCE_LIST}
-    LIBRARIES   mylibrary
+    LIBRARIES   screamy-ball gflags
     BLOCKS      ciSpeech
 )
 

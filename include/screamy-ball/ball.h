@@ -5,6 +5,8 @@
 #ifndef FINALPROJECT_INCLUDE_SCREAMY_BALL_BALL_H_
 #define FINALPROJECT_INCLUDE_SCREAMY_BALL_BALL_H_
 
+#include "location.h"
+
 namespace screamy_ball {
 enum class BallState {
   kRolling,
@@ -13,7 +15,11 @@ enum class BallState {
   kCollided
 };
 
-
+class Ball {
+ public:
+  Ball() : location_({2, 2}) {}
+  Location location_; //confirm if this is okay
+};
 
 }
 
