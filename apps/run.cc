@@ -42,7 +42,10 @@ void SetUp(App::Settings* settings) {
   vector<string> args = settings->getCommandLineArgs();
   ParseArgs(&args);
 
-  settings->setWindowSize(kWidth, kHeight);
+  const int width = static_cast<int>(FLAGS_width * FLAGS_tilesize);
+  const int height = static_cast<int>(FLAGS_height * FLAGS_tilesize);
+
+  settings->setWindowSize(width, height);
   settings->setTitle("Screamy Ball");
 }
 

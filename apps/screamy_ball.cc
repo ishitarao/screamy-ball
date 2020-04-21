@@ -18,6 +18,7 @@ using cinder::ColorA;
 using cinder::TextBox;
 using cinder::app::KeyEvent;
 using screamy_ball::BallState;
+using screamy_ball::Location;
 using std::string;
 
 #if defined(CINDER_COCOA_TOUCH)
@@ -141,8 +142,21 @@ void ScreamyBall::DrawGameOver() {
 }
 
 void ScreamyBall::DrawBall() {
-
+  const Location loc = engine_.GetBall().location_;
+  cinder::gl::color(Color(1, 0, 0));
+  if (engine_.state_ == BallState::kDucking) {
+    const cinder::ivec2 ellipse_center = {loc.Row() * tile_size_ + tile_size_ / 2,
+                                          loc.Col() * tile_size_ + tile_size_ / 8};
+    cinder::gl::drawSolidEllipse(ellipse_center,
+        ((float)tile_size_ / 2), ((float)tile_size_ / 8));
+  } else {
+    const cinder::ivec2 circle_center = {loc.Row() * tile_size_ + tile_size_ / 2,
+                                         loc.Col() * tile_size_ + tile_size_ / 2};
+    cinder::gl::drawSolidCircle(circle_center, ((float)tile_size_ / 2));
+  }
+  
 }
+
 void ScreamyBall::DrawObstacles() {
 /*
  * If there's no obstacle on the screen, then create an obstacle.
