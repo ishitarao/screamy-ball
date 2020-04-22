@@ -23,6 +23,7 @@ class ScreamyBall : public cinder::app::App {
   void update() override;
   void draw() override;
   void keyDown(cinder::app::KeyEvent) override;
+  void keyUp(cinder::app::KeyEvent) override;
 
  private:
   void DrawGameOver();
@@ -40,7 +41,7 @@ class ScreamyBall : public cinder::app::App {
   int tile_size_;
   int height_;
   int width_;
-  int delay_secs_;
+  double delay_secs_;
   double last_time_;
   cinder::Timer timer_;
   cinder::params::InterfaceGlRef params_;

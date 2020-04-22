@@ -16,11 +16,12 @@ class Engine {
   BallState state_;
 
  public:
-  Engine();
+  Engine(int ball_loc_x, int ball_loc_y);
   void Roll();
   void Jump();
-  void Reset();
+  void CreateObstacle();
   Ball GetBall();
+  void Reset();
 
 };
 }

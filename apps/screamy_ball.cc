@@ -41,7 +41,8 @@ DECLARE_uint32(tilesize);
 DECLARE_double(delay_secs);
 
 ScreamyBall::ScreamyBall()
-    : printed_game_over_{false},
+    : engine_(2, FLAGS_height - 2),
+      printed_game_over_{false},
       paused_{false},
       state_{GameState::kPlaying},
       tile_size_(FLAGS_tilesize),
@@ -80,10 +81,12 @@ void ScreamyBall::update() {
     timer_.stop();
   }
   const double current_time = timer_.getSeconds();
-  if (current_time - last_time_ > delay_secs_) {
+  if (current_time - last_time_ >= delay_secs_) {
     engine_.Roll();
     last_time_ = current_time;
   }
+
+
 
 }
 
@@ -146,15 +149,15 @@ void ScreamyBall::DrawBall() {
   cinder::gl::color(Color(1, 0, 0));
   if (engine_.state_ == BallState::kDucking) {
     const cinder::ivec2 ellipse_center = {loc.Row() * tile_size_ + tile_size_ / 2,
-                                          loc.Col() * tile_size_ + tile_size_ / 8};
+                                          loc.Col() * tile_size_ - (tile_size_) / 8};
     cinder::gl::drawSolidEllipse(ellipse_center,
         ((float)tile_size_ / 2), ((float)tile_size_ / 8));
   } else {
     const cinder::ivec2 circle_center = {loc.Row() * tile_size_ + tile_size_ / 2,
-                                         loc.Col() * tile_size_ + tile_size_ / 2};
+                                         loc.Col() * tile_size_ - tile_size_ / 2};
     cinder::gl::drawSolidCircle(circle_center, ((float)tile_size_ / 2));
   }
-  
+
 }
 
 void ScreamyBall::DrawObstacles() {
@@ -197,6 +200,17 @@ void ScreamyBall::keyDown(KeyEvent event) {
     case KeyEvent::KEY_r: {
       ConfirmReset();
       ResetGame();
+      break;
+    }
+  }
+}
+
+void ScreamyBall::keyUp(KeyEvent event) {
+  switch(event.getCode()) {
+    case KeyEvent::KEY_DOWN:
+    case KeyEvent::KEY_j:
+    case KeyEvent::KEY_s: {
+      engine_.state_ = BallState::kRolling;
       break;
     }
   }
