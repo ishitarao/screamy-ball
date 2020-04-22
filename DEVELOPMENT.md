@@ -12,7 +12,10 @@
   - Added a class to represent the ball's location 
   - Added an enum representing the ball state
   - Need to do (for today and tomorrow):
-    - [ ] Draw the ball normally and when ducking
+    - [x] Draw the ball normally and when ducking
     - [x] Add more logic to the engine
     - [x] Add logic for when the user presses a key
+- **4/21/20**
+  - Added a class to represent an obstacle
+  - Completely finish the representation of a ball (jumping and ducking)
 ---

@@ -17,7 +17,7 @@ enum class BallState {
 
 class Ball {
  public:
-  Ball(int loc_x, int loc_y) : location_({loc_x, loc_y}) {}
+  Ball(const Location& location) : location_(location) {}
   Location location_; //confirm if this is okay
 };
 

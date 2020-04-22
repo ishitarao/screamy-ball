@@ -5,7 +5,6 @@
 
 #include <cinder/app/App.h>
 #include <cinder/Timer.h>
-#include <cinder/params/Params.h>
 #include <sphinx/Recognizer.hpp>
 #include <screamy-ball/engine.h>
 
@@ -44,7 +43,6 @@ class ScreamyBall : public cinder::app::App {
   double delay_secs_;
   double last_time_;
   cinder::Timer timer_;
-  cinder::params::InterfaceGlRef params_;
 
 };
 

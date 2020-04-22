@@ -9,6 +9,7 @@
 #include <cinder/gl/draw.h>
 #include <cinder/gl/gl.h>
 #include <gflags/gflags.h>
+#include <sphinx/Recognizer.hpp>
 
 
 namespace screamyball_app {
@@ -17,6 +18,7 @@ using cinder::Color;
 using cinder::ColorA;
 using cinder::TextBox;
 using cinder::app::KeyEvent;
+using ci::fs::path;
 using screamy_ball::BallState;
 using screamy_ball::Location;
 using std::string;
@@ -41,7 +43,7 @@ DECLARE_uint32(tilesize);
 DECLARE_double(delay_secs);
 
 ScreamyBall::ScreamyBall()
-    : engine_(2, FLAGS_height - 2),
+    : engine_({2, static_cast<int>(FLAGS_height - 2)}),
       printed_game_over_{false},
       paused_{false},
       state_{GameState::kPlaying},
@@ -56,10 +58,11 @@ void ScreamyBall::setup() {
   cinder::gl::enableDepthRead();
   timer_.start();
 
-  // Create the interface and give it a name.
-  params_ = cinder::params::InterfaceGl::create( getWindow(),
-      "App parameters",
-      cinder::app::toPixels( cinder::ivec2( 200, 400 ) ) );
+  ci::fs::path hmm_path  = ci::app::getAssetPath( "en-us" );
+  ci::fs::path dict_path = ci::app::getAssetPath( "cmudict-en-us.dict" );
+  ci::fs::path lm_path   = ci::app::getAssetPath( "demo.jsgf" );
+  sphinx::RecognizerRef recognizer =
+      sphinx::Recognizer::create( hmm_path.string(), dict_path.string() );
 }
 
 string PrettyPrintElapsedTime(double time_secs) {
@@ -145,6 +148,7 @@ void ScreamyBall::DrawGameOver() {
 }
 
 void ScreamyBall::DrawBall() {
+  // TODO: Get rid of the magic numbers and make this look more readable
   const Location loc = engine_.GetBall().location_;
   cinder::gl::color(Color(1, 0, 0));
   if (engine_.state_ == BallState::kDucking) {
@@ -172,6 +176,8 @@ void ScreamyBall::DrawObstacles() {
  *  Maybe we can randomize their appearance.
  *
  */
+const Location loc = engine_.GetObstacle().location_;
+cinder::gl::color(Color::white());
 
 
 }

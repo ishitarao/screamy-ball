@@ -4,12 +4,13 @@
 
 namespace screamy_ball {
 
-Engine::Engine(int ball_loc_x, int ball_loc_y) :
+Engine::Engine(const Location& ball_loc) :
     state_(BallState::kRolling),
-    ball_(ball_loc_x, ball_loc_y),
-    kMaxHeight(ball_loc_y - 3),
-    kMinHeight(ball_loc_y),
-    reached_max_height_(false) {}
+    ball_(ball_loc),
+    kMaxHeight(ball_loc.Col() - 3),
+    kMinHeight(ball_loc.Col()),
+    reached_max_height_(false),
+    is_obstacle_on_screen(false) {}
 
 void Engine::Roll() {
   switch (state_) {
@@ -46,11 +47,22 @@ void Engine::Jump() {
 }
 
 void Engine::CreateObstacle() {
-
+  if (is_obstacle_on_screen) {
+    if (obstacle_.location_.Row() == 0) {
+      obstacle_.location_ = {4, 2};
+      is_obstacle_on_screen = false;
+    }
+    return;
+  }
+  //Obstacle obstacle(ObstacleType::kLow, {})
 }
 
 Ball Engine::GetBall() {
   return ball_;
+}
+
+Obstacle Engine::GetObstacle() {
+  return obstacle_;
 }
 
 void Engine::Reset() {

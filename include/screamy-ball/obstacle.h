@@ -18,6 +18,7 @@ class Obstacle {
 
  public:
   Location location_;
+  Obstacle();
   Obstacle(ObstacleType type, Location location);
   ObstacleType GetObstacleType();
 
