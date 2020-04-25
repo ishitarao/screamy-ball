@@ -10,8 +10,9 @@ namespace screamy_ball {
 class Engine {
   const int kMaxHeight;
   const int kMinHeight;
+  const int kWindowWidth;
+  const int kWindowHeight;
   bool reached_max_height_;
-  bool is_obstacle_on_screen;
   Ball ball_;
   Obstacle obstacle_;
 
@@ -19,10 +20,10 @@ class Engine {
   BallState state_;
 
  public:
-  Engine(const Location& ball_loc);
+  Engine(const Location& ball_loc, int  width, int height);
   void Roll();
   void Jump();
-  void CreateObstacle();
+  Obstacle CreateObstacle();
   Ball GetBall();
   Obstacle GetObstacle();
   void Reset();

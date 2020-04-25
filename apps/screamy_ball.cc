@@ -43,7 +43,8 @@ DECLARE_uint32(tilesize);
 DECLARE_double(delay_secs);
 
 ScreamyBall::ScreamyBall()
-    : engine_({2, static_cast<int>(FLAGS_height - 2)}),
+    : engine_({2, static_cast<int>(FLAGS_height - 2)},
+        FLAGS_width, FLAGS_height),
       printed_game_over_{false},
       paused_{false},
       state_{GameState::kPlaying},
@@ -86,6 +87,7 @@ void ScreamyBall::update() {
   const double current_time = timer_.getSeconds();
   if (current_time - last_time_ >= delay_secs_) {
     engine_.Roll();
+    engine_.CreateObstacle();
     last_time_ = current_time;
   }
 
@@ -151,6 +153,7 @@ void ScreamyBall::DrawBall() {
   // TODO: Get rid of the magic numbers and make this look more readable
   const Location loc = engine_.GetBall().location_;
   cinder::gl::color(Color(1, 0, 0));
+
   if (engine_.state_ == BallState::kDucking) {
     const cinder::ivec2 ellipse_center = {loc.Row() * tile_size_ + tile_size_ / 2,
                                           loc.Col() * tile_size_ - (tile_size_) / 8};
@@ -176,24 +179,37 @@ void ScreamyBall::DrawObstacles() {
  *  Maybe we can randomize their appearance.
  *
  */
-const Location loc = engine_.GetObstacle().location_;
-cinder::gl::color(Color::white());
+  const Location loc = engine_.GetObstacle().location_;
+  const int obstacle_height = engine_.GetObstacle().GetHeight();
+  cinder::gl::color(Color::white());
 
+  const cinder::ivec2 tri_pt_1 = {loc.Row() * tile_size_,
+                                  loc.Col() * tile_size_};
+  const cinder::ivec2 tri_pt_2 = {(loc.Row() + 1) * tile_size_,
+                                  loc.Col() * tile_size_};
+  const cinder::ivec2 tri_pt_3 = {(loc.Row() + (1 / 2)) * tile_size_,
+                                  (loc.Col() - obstacle_height) * tile_size_};
 
+  cinder::gl::drawSolidTriangle(tri_pt_1, tri_pt_2, tri_pt_3);
 }
 
 void ScreamyBall::keyDown(KeyEvent event) {
-  // down key needs to be held down for ball to remain ducking
   switch (event.getCode()) {
     case KeyEvent::KEY_UP:
     case KeyEvent::KEY_k:
     case KeyEvent::KEY_w: {
+      if (paused_) {
+        return;
+      }
       engine_.state_ = BallState::kJumping;
       break;
     }
     case KeyEvent::KEY_DOWN:
     case KeyEvent::KEY_j:
     case KeyEvent::KEY_s: {
+      if (paused_ || engine_.state_ == BallState::kJumping) {
+        return;
+      }
       engine_.state_ = BallState::kDucking;
       break;
     }

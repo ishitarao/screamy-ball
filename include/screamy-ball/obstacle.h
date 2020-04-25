@@ -12,16 +12,15 @@ namespace screamy_ball {
 enum class ObstacleType { kHigh, kLow };
 
 class Obstacle {
-  const int kHeight;
-  ObstacleType obstacle_type_;
-
+  static const int kHeight = 2;
 
  public:
+  ObstacleType obstacle_type_;
   Location location_;
   Obstacle();
-  Obstacle(ObstacleType type, Location location);
+  Obstacle(ObstacleType type, const Location& location);
   ObstacleType GetObstacleType();
-
+  int GetHeight();
 
 };
 

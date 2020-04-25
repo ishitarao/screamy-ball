@@ -18,4 +18,7 @@
 - **4/21/20**
   - Added a class to represent an obstacle
   - Completely finish the representation of a ball (jumping and ducking)
+- **4/25/20**
+  - Completed writing the logic and the drawing of the obstacle
+  - Ensured that user can't duck mid-air
 ---
