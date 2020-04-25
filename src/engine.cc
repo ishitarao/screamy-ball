@@ -68,7 +68,11 @@ Obstacle Engine::CreateObstacle() {
 
   ObstacleType type = rand_bool(rng) ? ObstacleType::kHigh : ObstacleType::kLow;
 
-  obstacle_.location_ = {kWindowWidth, kMinHeight};
+  if (type == ObstacleType::kHigh) {
+    obstacle_.location_ = {kWindowWidth, kMinHeight - obstacle_.GetHeight() - 1};
+  } else {
+    obstacle_.location_ = {kWindowWidth, kMinHeight};
+  }
   obstacle_.type_ = type;
   obstacle_.length_ = rand_length(rng);
 

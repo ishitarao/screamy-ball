@@ -167,6 +167,7 @@ void ScreamyBall::DrawBall() {
 
 }
 
+
 void ScreamyBall::DrawObstacles() {
   screamy_ball::Obstacle obstacle = engine_.GetObstacle();
   Location loc = obstacle.location_;
@@ -175,16 +176,27 @@ void ScreamyBall::DrawObstacles() {
 
   //create spikes
   for (int counter = 0; counter < obstacle.length_; counter++) {
-    const cinder::ivec2 tri_pt_1 = {loc.Row() * tile_size_,
-                                    loc.Col() * tile_size_};
-    const cinder::ivec2 tri_pt_2 = {(loc.Row() - 1) * tile_size_,
-                                    loc.Col() * tile_size_};
-    const cinder::ivec2 tri_pt_3 = {(loc.Row() - (0.5)) * tile_size_,
-                                    (loc.Col() - obstacle_height) * tile_size_};
+    cinder::ivec2 tri_pt_1 = {loc.Row() * tile_size_,
+                              loc.Col() * tile_size_};
+    cinder::ivec2 tri_pt_2 = {(loc.Row() - 1) * tile_size_,
+                              loc.Col() * tile_size_};
+
+    cinder::ivec2 tri_pt_3 = {(loc.Row() - (0.5)) * tile_size_,
+                              (loc.Col() - obstacle_height) * tile_size_};
+
+    if (obstacle.GetObstacleType() == screamy_ball::ObstacleType::kHigh) {
+      tri_pt_1.y += tile_size_ / 2;
+      tri_pt_2.y += tile_size_ / 2;
+      tri_pt_3.y = (loc.Col() + obstacle_height) * tile_size_ + tile_size_ / 2;
+    }
 
     cinder::gl::drawSolidTriangle(tri_pt_1, tri_pt_2, tri_pt_3);
     loc = {loc.Row() + 1, loc.Col()};
   }
+
+  // low obstacles
+
+
 }
 
 void ScreamyBall::keyDown(KeyEvent event) {

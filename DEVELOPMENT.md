@@ -19,6 +19,6 @@
   - Added a class to represent an obstacle
   - Completely finish the representation of a ball (jumping and ducking)
 - **4/25/20**
-  - Completed writing the logic and the drawing of the obstacle
+  - Completed writing the logic and the drawing of both types of obstacles
   - Ensured that user can't duck mid-air
 ---
