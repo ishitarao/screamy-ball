@@ -7,15 +7,17 @@
 namespace screamy_ball {
 
 Obstacle::Obstacle():
-    obstacle_type_(ObstacleType::kHigh),
-    location_({0, 0}) {}
+    type_(ObstacleType::kHigh),
+    location_({0, 0}),
+    length_(3) {}
 
 Obstacle::Obstacle(ObstacleType type, const Location& location):
-    obstacle_type_(type),
-    location_(location) {}
+    type_(type),
+    location_(location),
+    length_(3) {}
 
 ObstacleType Obstacle::GetObstacleType() {
-  return obstacle_type_;
+  return type_;
 }
 
 int Obstacle::GetHeight() { return kHeight; }

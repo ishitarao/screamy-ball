@@ -168,29 +168,23 @@ void ScreamyBall::DrawBall() {
 }
 
 void ScreamyBall::DrawObstacles() {
-/*
- * If there's no obstacle on the screen, then create an obstacle.
- * If there's an obstacle on the screen, don't create a new obstacle.
- *  However, do make it change its position to be closer to the ball.
- *  Also, you can create obstacles of multiple sizes.
- *
- *  There should be two types of obstacles: high and low.
- *  You have to jump over the high ones and duck beneath the low ones.
- *  Maybe we can randomize their appearance.
- *
- */
-  const Location loc = engine_.GetObstacle().location_;
-  const int obstacle_height = engine_.GetObstacle().GetHeight();
-  cinder::gl::color(Color::white());
+  screamy_ball::Obstacle obstacle = engine_.GetObstacle();
+  Location loc = obstacle.location_;
+  const int obstacle_height = obstacle.GetHeight();
+  cinder::gl::color(Color::gray(0.5));
 
-  const cinder::ivec2 tri_pt_1 = {loc.Row() * tile_size_,
-                                  loc.Col() * tile_size_};
-  const cinder::ivec2 tri_pt_2 = {(loc.Row() + 1) * tile_size_,
-                                  loc.Col() * tile_size_};
-  const cinder::ivec2 tri_pt_3 = {(loc.Row() + (1 / 2)) * tile_size_,
-                                  (loc.Col() - obstacle_height) * tile_size_};
+  //create spikes
+  for (int counter = 0; counter < obstacle.length_; counter++) {
+    const cinder::ivec2 tri_pt_1 = {loc.Row() * tile_size_,
+                                    loc.Col() * tile_size_};
+    const cinder::ivec2 tri_pt_2 = {(loc.Row() - 1) * tile_size_,
+                                    loc.Col() * tile_size_};
+    const cinder::ivec2 tri_pt_3 = {(loc.Row() - (0.5)) * tile_size_,
+                                    (loc.Col() - obstacle_height) * tile_size_};
 
-  cinder::gl::drawSolidTriangle(tri_pt_1, tri_pt_2, tri_pt_3);
+    cinder::gl::drawSolidTriangle(tri_pt_1, tri_pt_2, tri_pt_3);
+    loc = {loc.Row() + 1, loc.Col()};
+  }
 }
 
 void ScreamyBall::keyDown(KeyEvent event) {

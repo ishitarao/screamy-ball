@@ -9,7 +9,7 @@ namespace screamy_ball {
 Engine::Engine(const Location& ball_loc, int width, int height) :
     state_(BallState::kRolling),
     ball_(ball_loc),
-    kMaxHeight(ball_loc.Col() - 3),
+    kMaxHeight(ball_loc.Col() - 4),
     kMinHeight(ball_loc.Col()),
     kWindowWidth(width),
     kWindowHeight(height),
@@ -56,18 +56,21 @@ Obstacle Engine::CreateObstacle() {
                          obstacle_.location_.Col()};
 
   // if the obstacle hasn't reached the end of the screen, return
-  if (obstacle_.location_.Row() != 0) {
+  if (obstacle_.location_.Row() != -(obstacle_.length_)) {
     return obstacle_;
   }
 
-  //generate a random bool to determine the obstacle type
-  static auto gen = std::bind(std::uniform_int_distribution<>(0,1),
-                              std::default_random_engine());
+  // generate a random obstacle length and a random obstacle type
+  std::random_device dev;
+  std::mt19937 rng(dev());
+  std::uniform_int_distribution<std::mt19937::result_type> rand_length(2,5);
+  std::uniform_int_distribution<std::mt19937::result_type> rand_bool(0,1);
 
-  ObstacleType type = gen() ? ObstacleType::kHigh : ObstacleType::kLow;
+  ObstacleType type = rand_bool(rng) ? ObstacleType::kHigh : ObstacleType::kLow;
 
   obstacle_.location_ = {kWindowWidth, kMinHeight};
-  obstacle_.obstacle_type_ = type;
+  obstacle_.type_ = type;
+  obstacle_.length_ = rand_length(rng);
 
   return obstacle_;
 }

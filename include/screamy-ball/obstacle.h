@@ -15,7 +15,8 @@ class Obstacle {
   static const int kHeight = 2;
 
  public:
-  ObstacleType obstacle_type_;
+  ObstacleType type_;
+  int length_;
   Location location_;
   Obstacle();
   Obstacle(ObstacleType type, const Location& location);
