@@ -8,6 +8,7 @@
   - Added a Direction enum representing the user's possible directions
   - Added functionality to print text
   - Added logic to input key events from a user
+  - Added a game over screen
 - **4/20/20**
   - Added a class to represent the ball's location 
   - Added an enum representing the ball state
@@ -19,6 +20,7 @@
   - Added a class to represent an obstacle
   - Completely finish the representation of a ball (jumping and ducking)
 - **4/25/20**
-  - Completed writing the logic and the drawing of both types of obstacles
+  - Completed the logic and the drawing of both types of obstacles
   - Ensured that user can't duck mid-air
+  - Completed writing collision logic
 ---

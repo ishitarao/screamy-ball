@@ -86,8 +86,10 @@ void ScreamyBall::update() {
   }
   const double current_time = timer_.getSeconds();
   if (current_time - last_time_ >= delay_secs_) {
-    engine_.Roll();
-    engine_.CreateObstacle();
+    engine_.Run();
+    if (engine_.state_ == BallState::kCollided) {
+      state_ = GameState::kGameOver;
+    }
     last_time_ = current_time;
   }
 
@@ -143,7 +145,6 @@ void ScreamyBall::DrawGameOver() {
   const cinder::ivec2 size = {500, 50};
   const Color color = Color::white();
   string elapsed_time = PrettyPrintElapsedTime(timer_.getSeconds());
-  PrintText("Game Over :(", color, size, center);
   PrintText("Your time: " + elapsed_time, color, size, center);
 
   printed_game_over_ = true;

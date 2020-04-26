@@ -21,11 +21,12 @@ class Engine {
 
  public:
   Engine(const Location& ball_loc, int  width, int height);
-  void Roll();
+  void Run();
   void Jump();
   Obstacle CreateObstacle();
   Ball GetBall();
   Obstacle GetObstacle();
+  bool HasCollided();
   void Reset();
 
 };
