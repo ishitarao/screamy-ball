@@ -25,6 +25,9 @@
   - Completed writing collision logic
   - Added a ground
   - Need to do:
-    - [ ] Begin working on speech recognition
+    - [x] Begin working on speech recognition
     - [ ] Ensure that the 'high' spikes aren't just floating in mid air
+- **4/26/20**
+  - Integrated speech recognition with the game
+  
 ---

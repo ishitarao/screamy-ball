@@ -25,6 +25,8 @@ class ScreamyBall : public cinder::app::App {
   void keyUp(cinder::app::KeyEvent) override;
 
  private:
+  void RecognizeCommands(const std::string& msg);
+  void ParseUserInteraction(int event_code);
   void DrawBackground();
   void DrawGameOver();
   void ResetGame();
@@ -44,6 +46,7 @@ class ScreamyBall : public cinder::app::App {
   double delay_secs_;
   double last_time_;
   cinder::Timer timer_;
+  sphinx::RecognizerRef recognizer_;
 
 };
 

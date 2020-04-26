@@ -56,7 +56,7 @@ Obstacle Engine::CreateObstacle() {
   // generate a random obstacle length and a random obstacle type
   std::random_device dev;
   std::mt19937 rng(dev());
-  std::uniform_int_distribution<std::mt19937::result_type> rand_length(2,5);
+  std::uniform_int_distribution<std::mt19937::result_type> rand_length(2,4);
   std::uniform_int_distribution<std::mt19937::result_type> rand_bool(0,1);
 
   ObstacleType type = rand_bool(rng) ? ObstacleType::kHigh : ObstacleType::kLow;

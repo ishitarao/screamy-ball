@@ -1,0 +1,4 @@
+higher/1e-10/
+lower/1e-10/
+pause game/1e-30/
+reset game/1e-30/

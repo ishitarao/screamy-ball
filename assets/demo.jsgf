@@ -1,4 +1,0 @@
-#JSGF V1.0;
-grammar demo;
-
-public <command> = ( jump | pause | reset | help | duck | options );

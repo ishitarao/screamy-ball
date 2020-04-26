@@ -59,11 +59,15 @@ void ScreamyBall::setup() {
   cinder::gl::enableDepthRead();
   timer_.start();
 
-  ci::fs::path hmm_path  = ci::app::getAssetPath( "en-us" );
-  ci::fs::path dict_path = ci::app::getAssetPath( "cmudict-en-us.dict" );
-  ci::fs::path lm_path   = ci::app::getAssetPath( "demo.jsgf" );
-  sphinx::RecognizerRef recognizer =
-      sphinx::Recognizer::create( hmm_path.string(), dict_path.string() );
+  ci::fs::path hmm_path  = ci::app::getAssetPath("en-us");
+  ci::fs::path dict_path = ci::app::getAssetPath("cmudict-en-us.dict");
+  ci::fs::path keyword_path   = ci::app::getAssetPath("key.txt");
+  recognizer_ = sphinx::Recognizer::create(hmm_path.string(), dict_path.string());
+  recognizer_->connectEventHandler(std::bind(
+      &ScreamyBall::RecognizeCommands, this, std::placeholders::_1));
+  recognizer_->addModelJsgf("keyword", keyword_path.string(),
+      true);
+  recognizer_->start();
 }
 
 string PrettyPrintElapsedTime(double time_secs) {
@@ -84,6 +88,8 @@ void ScreamyBall::update() {
   if (state_ == GameState::kGameOver) {
     timer_.stop();
   }
+  if (paused_) return;
+
   const double current_time = timer_.getSeconds();
   if (current_time - last_time_ >= delay_secs_) {
     engine_.Run();
@@ -206,8 +212,24 @@ void ScreamyBall::DrawObstacles() {
 
 }
 
+void ScreamyBall::RecognizeCommands(const std::string& message) {
+  if (message == "higher") {
+    ParseUserInteraction(KeyEvent::KEY_UP);
+  } else if (message == "lower") {
+    ParseUserInteraction(KeyEvent::KEY_DOWN);
+  } else if (message == "pause game") {
+    ParseUserInteraction(KeyEvent::KEY_p);
+  } else if (message == "reset game") {
+    ParseUserInteraction(KeyEvent::KEY_r);
+  }
+}
+
 void ScreamyBall::keyDown(KeyEvent event) {
-  switch (event.getCode()) {
+  ParseUserInteraction(event.getCode());
+}
+
+void ScreamyBall::ParseUserInteraction(int event_code) {
+  switch (event_code) {
     case KeyEvent::KEY_UP:
     case KeyEvent::KEY_k:
     case KeyEvent::KEY_w: {
@@ -229,7 +251,11 @@ void ScreamyBall::keyDown(KeyEvent event) {
 
     case KeyEvent::KEY_p: {
       paused_ = !paused_;
-
+      if (paused_) {
+        timer_.stop();
+      } else {
+        timer_.resume();
+      }
       break;
     }
     case KeyEvent::KEY_r: {
@@ -237,6 +263,7 @@ void ScreamyBall::keyDown(KeyEvent event) {
       ResetGame();
       break;
     }
+    default: break;
   }
 }
 
