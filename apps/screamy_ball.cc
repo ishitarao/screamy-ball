@@ -92,9 +92,6 @@ void ScreamyBall::update() {
     }
     last_time_ = current_time;
   }
-
-
-
 }
 
 void ScreamyBall::draw() {
@@ -110,7 +107,7 @@ void ScreamyBall::draw() {
 
   if (paused_) return;
 
-  cinder::gl::clear(Color::black());
+  DrawBackground();
   DrawBall();
   DrawObstacles();
 
@@ -135,6 +132,15 @@ void PrintText(const string& text, const C& color, const cinder::ivec2& size,
   const auto surface = box.render();
   const auto texture = cinder::gl::Texture::create(surface);
   cinder::gl::draw(texture, locp);
+}
+
+void ScreamyBall::DrawBackground() {
+  cinder::gl::clear(Color::black());
+  int ground_height = engine_.GetMinHeight();
+  cinder::gl::color(Color::white());
+  const cinder::ivec2 upper_left = {0, tile_size_ * ground_height};
+  const cinder::ivec2 bottom_right = {width_ * tile_size_, tile_size_ * height_};
+  cinder::gl::drawSolidRect(cinder::Rectf(upper_left, bottom_right));
 }
 
 void ScreamyBall::DrawGameOver() {

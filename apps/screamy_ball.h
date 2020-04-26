@@ -25,6 +25,7 @@ class ScreamyBall : public cinder::app::App {
   void keyUp(cinder::app::KeyEvent) override;
 
  private:
+  void DrawBackground();
   void DrawGameOver();
   void ResetGame();
   bool ConfirmReset();

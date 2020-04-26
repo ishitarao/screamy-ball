@@ -97,6 +97,10 @@ Obstacle Engine::GetObstacle() {
   return obstacle_;
 }
 
+int Engine::GetMinHeight() {
+  return kMinHeight;
+}
+
 void Engine::Reset() {
   state_ = BallState::kRolling;
 }

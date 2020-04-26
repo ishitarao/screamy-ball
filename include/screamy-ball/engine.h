@@ -26,6 +26,7 @@ class Engine {
   Obstacle CreateObstacle();
   Ball GetBall();
   Obstacle GetObstacle();
+  int GetMinHeight();
   bool HasCollided();
   void Reset();
 

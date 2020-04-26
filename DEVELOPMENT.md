@@ -23,4 +23,8 @@
   - Completed the logic and the drawing of both types of obstacles
   - Ensured that user can't duck mid-air
   - Completed writing collision logic
+  - Added a ground
+  - Need to do:
+    - [ ] Begin working on speech recognition
+    - [ ] Ensure that the 'high' spikes aren't just floating in mid air
 ---
