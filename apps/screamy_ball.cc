@@ -1,16 +1,13 @@
 // Copyright (c) 2020 Ishita Rao. All rights reserved.
 
 #include "screamy_ball.h"
-
-#include <cinder/app/App.h>
 #include <cinder/Font.h>
 #include <cinder/Text.h>
 #include <cinder/Vector.h>
+#include <cinder/app/App.h>
 #include <cinder/gl/draw.h>
 #include <cinder/gl/gl.h>
 #include <gflags/gflags.h>
-#include <sphinx/Recognizer.hpp>
-
 
 namespace screamyball_app {
 
@@ -19,10 +16,12 @@ using cinder::ColorA;
 using cinder::TextBox;
 using cinder::app::KeyEvent;
 using cinder::app::MouseEvent;
+using cinder::params::InterfaceGl;
 using ci::fs::path;
 using screamy_ball::BallState;
 using screamy_ball::Location;
 using std::string;
+using std::bind;
 
 #if defined(CINDER_COCOA_TOUCH)
 const char kNormalFont[] = "Arial";
@@ -46,8 +45,8 @@ DECLARE_double(delay_secs);
 ScreamyBall::ScreamyBall()
     : engine_({2, static_cast<int>(FLAGS_height - 2)},
         FLAGS_width, FLAGS_height),
-      printed_game_over_{false},
-      paused_{false},
+      printed_game_over_(false),
+      paused_(false),
       confirmed_reset_(false),
       state_{GameState::kPlaying},
       tile_size_(FLAGS_tilesize),
@@ -60,16 +59,43 @@ void ScreamyBall::setup() {
   cinder::gl::enableDepthWrite();
   cinder::gl::enableDepthRead();
   timer_.start();
+  SetupRecognizer();
 
+}
+
+void ScreamyBall::SetupRecognizer() {
   ci::fs::path hmm_path  = ci::app::getAssetPath("en-us");
   ci::fs::path dict_path = ci::app::getAssetPath("cmudict-en-us.dict");
   ci::fs::path keyword_path   = ci::app::getAssetPath("key.txt");
+
+  //set up the language and the dictionary
   recognizer_ = sphinx::Recognizer::create(hmm_path.string(), dict_path.string());
+
+  //event handler for whenever speech is detected
   recognizer_->connectEventHandler(std::bind(
       &ScreamyBall::RecognizeCommands, this, std::placeholders::_1));
+
+  //create and add a model based on the text file
   recognizer_->addModelJsgf("keyword", keyword_path.string(),
-      true);
+                            true);
   recognizer_->start();
+}
+
+void ScreamyBall::SetupUI() {
+  //set up main menu UI:
+  menu_ui_ = InterfaceGl::create(getWindow(), "Main Menu",
+                                 cinder::app::toPixels(cinder::ivec2(200, 400)));
+
+  menu_ui_->addButton( "Start", [&]() { state_ = GameState::kPlaying; } );
+  menu_ui_->addButton( "Help", std::bind( &ScreamyBall::update, this ) );
+
+
+  //mParams->addButton( "Leaderboard", bind( &TweakBarApp::button, this ) );
+
+
+  //set up in-game UI:
+  in_game_ui_ = InterfaceGl::create(getWindow(), "In-Game UI",
+                                    cinder::app::toPixels(cinder::ivec2(200, 400)));
 }
 
 string PrettyPrintElapsedTime(double time_secs) {
@@ -152,6 +178,15 @@ void PrintText(const string& text, int font_size, const C& color,
   cinder::gl::draw(texture, locp);
 }
 
+void ScreamyBall::DrawMainMenu() {
+  DrawBackground();
+  /*
+   * Print "Screamy Ball"
+   * Options: Play Game, Help pl0x
+   */
+
+}
+
 void ScreamyBall::DrawBackground() {
   cinder::gl::clear(Color::black());
 
@@ -169,9 +204,8 @@ void ScreamyBall::DrawButtons() {
   const Color text_color = Color::white();
 
   const cinder::vec2 pause_button_loc = {tile_size_ * 1.5, tile_size_};
-  const ColorA pause_button_color = ColorA(1, 0, 0, 0.75);
-
   const cinder::vec2 reset_button_loc = {tile_size_ * 4, tile_size_};
+  const ColorA pause_button_color = ColorA(1, 0, 0, 0.75);
   const ColorA reset_button_color = ColorA(0, 1, 0, 0.75);
 
   PrintText("Pause", font_size, text_color, size, pause_button_loc, pause_button_color);
@@ -323,6 +357,8 @@ void ScreamyBall::mouseDown(MouseEvent event) {
     }
   } else {
     if (event.isLeftDown()) {
+      //if (event.getPos() )
+
       ParseUserInteraction(KeyEvent::KEY_UP);
     } else if (event.isRightDown()) {
       ParseUserInteraction(KeyEvent::KEY_DOWN);

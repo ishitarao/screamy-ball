@@ -5,15 +5,18 @@
 
 #include <cinder/app/App.h>
 #include <cinder/Timer.h>
+#include <cinder/params/Params.h>
 #include <sphinx/Recognizer.hpp>
 #include <screamy-ball/engine.h>
 
 namespace screamyball_app {
 
 enum class GameState {
+  kMenu,
+  kHelp,
   kPlaying,
   kGameOver,
-  kConfirmingReset,
+  kConfirmingReset
 };
 
 class ScreamyBall : public cinder::app::App {
@@ -28,8 +31,11 @@ class ScreamyBall : public cinder::app::App {
   void mouseUp(cinder::app::MouseEvent) override;
 
  private:
+  void SetupRecognizer();
+  void SetupUI();
   void RecognizeCommands(const std::string& msg);
   void ParseUserInteraction(int event_code);
+  void DrawMainMenu();
   void DrawBackground();
   void DrawButtons();
   void DrawGameOver();
@@ -52,6 +58,8 @@ class ScreamyBall : public cinder::app::App {
   double last_time_;
   cinder::Timer timer_;
   sphinx::RecognizerRef recognizer_;
+  cinder::params::InterfaceGlRef menu_ui_;
+  cinder::params::InterfaceGlRef in_game_ui_;
 
 };
 

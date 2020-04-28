@@ -29,5 +29,8 @@
     - [ ] Ensure that the 'high' spikes aren't just floating in mid air
 - **4/26/20**
   - Integrated speech recognition with the game
+- **4/27/20**
+  - Added support for PretzelGui to the project
+  - Integrated mouse control with the game
   
 ---
