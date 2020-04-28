@@ -18,6 +18,7 @@ using cinder::Color;
 using cinder::ColorA;
 using cinder::TextBox;
 using cinder::app::KeyEvent;
+using cinder::app::MouseEvent;
 using ci::fs::path;
 using screamy_ball::BallState;
 using screamy_ball::Location;
@@ -47,6 +48,7 @@ ScreamyBall::ScreamyBall()
         FLAGS_width, FLAGS_height),
       printed_game_over_{false},
       paused_{false},
+      confirmed_reset_(false),
       state_{GameState::kPlaying},
       tile_size_(FLAGS_tilesize),
       height_(FLAGS_height),
@@ -85,11 +87,17 @@ string PrettyPrintElapsedTime(double time_secs) {
 }
 
 void ScreamyBall::update() {
-  if (state_ == GameState::kGameOver) {
+  if (state_ == GameState::kGameOver || state_ == GameState::kConfirmingReset) {
     timer_.stop();
+    if (confirmed_reset_) {
+      ResetGame();
+    }
+    return;
   }
   if (paused_) return;
-
+  if (timer_.isStopped()) {
+    timer_.resume();
+  }
   const double current_time = timer_.getSeconds();
   if (current_time - last_time_ >= delay_secs_) {
     engine_.Run();
@@ -114,27 +122,31 @@ void ScreamyBall::draw() {
   if (paused_) return;
 
   DrawBackground();
+  DrawButtons();
   DrawBall();
   DrawObstacles();
+  if (state_ == GameState::kConfirmingReset) {
+    ConfirmReset();
+  }
 
 }
 
 template <typename C>
-void PrintText(const string& text, const C& color, const cinder::ivec2& size,
-               const cinder::vec2& loc,
+void PrintText(const string& text, int font_size, const C& color,
+               const cinder::ivec2& size, const cinder::vec2& loc,
                const ColorA& bg_color = ColorA::zero()) {
   cinder::gl::color(color);
 
   auto box = TextBox()
       .alignment(TextBox::CENTER)
-      .font(cinder::Font(kNormalFont, 30))
+      .font(cinder::Font(kNormalFont, font_size))
       .size(size)
       .color(color)
       .backgroundColor(bg_color)
       .text(text);
 
   const auto box_size = box.getSize();
-  const cinder::vec2 locp = {loc.x - box_size.x / 2, loc.y - box_size.y / 2};
+  const cinder::vec2 locp = {loc.x - box_size.x / 2.0, loc.y - box_size.y / 2.0};
   const auto surface = box.render();
   const auto texture = cinder::gl::Texture::create(surface);
   cinder::gl::draw(texture, locp);
@@ -142,11 +154,28 @@ void PrintText(const string& text, const C& color, const cinder::ivec2& size,
 
 void ScreamyBall::DrawBackground() {
   cinder::gl::clear(Color::black());
+
+  // draw the ground:
   int ground_height = engine_.GetMinHeight();
   cinder::gl::color(Color::white());
   const cinder::ivec2 upper_left = {0, tile_size_ * ground_height};
   const cinder::ivec2 bottom_right = {width_ * tile_size_, tile_size_ * height_};
   cinder::gl::drawSolidRect(cinder::Rectf(upper_left, bottom_right));
+}
+
+void ScreamyBall::DrawButtons() {
+  const int font_size = 25;
+  const cinder::ivec2 size = {tile_size_ * 2, font_size + 10}; //10 is a buffer
+  const Color text_color = Color::white();
+
+  const cinder::vec2 pause_button_loc = {tile_size_ * 1.5, tile_size_};
+  const ColorA pause_button_color = ColorA(1, 0, 0, 0.75);
+
+  const cinder::vec2 reset_button_loc = {tile_size_ * 4, tile_size_};
+  const ColorA reset_button_color = ColorA(0, 1, 0, 0.75);
+
+  PrintText("Pause", font_size, text_color, size, pause_button_loc, pause_button_color);
+  PrintText("Reset", font_size, text_color, size, reset_button_loc, reset_button_color);
 }
 
 void ScreamyBall::DrawGameOver() {
@@ -157,7 +186,7 @@ void ScreamyBall::DrawGameOver() {
   const cinder::ivec2 size = {500, 50};
   const Color color = Color::white();
   string elapsed_time = PrettyPrintElapsedTime(timer_.getSeconds());
-  PrintText("Your time: " + elapsed_time, color, size, center);
+  PrintText("Your time: " + elapsed_time, 30, color, size, center);
 
   printed_game_over_ = true;
 }
@@ -168,14 +197,14 @@ void ScreamyBall::DrawBall() {
   cinder::gl::color(Color(1, 0, 0));
 
   if (engine_.state_ == BallState::kDucking) {
-    const cinder::ivec2 ellipse_center = {loc.Row() * tile_size_ + tile_size_ / 2,
-                                          loc.Col() * tile_size_ - (tile_size_) / 8};
+    const cinder::ivec2 ellipse_center = {(loc.Row() + 0.5) * tile_size_,
+                                          (loc.Col() - 0.125) * tile_size_};
     cinder::gl::drawSolidEllipse(ellipse_center,
-        ((float)tile_size_ / 2), ((float)tile_size_ / 8));
+        ((float)tile_size_ * 0.5f), ((float)tile_size_ * 0.125f));
   } else {
-    const cinder::ivec2 circle_center = {loc.Row() * tile_size_ + tile_size_ / 2,
-                                         loc.Col() * tile_size_ - tile_size_ / 2};
-    cinder::gl::drawSolidCircle(circle_center, ((float)tile_size_ / 2));
+    const cinder::ivec2 circle_center = {(loc.Row() + 0.5) * tile_size_,
+                                         (loc.Col() - 0.5) * tile_size_};
+    cinder::gl::drawSolidCircle(circle_center, ((float)tile_size_ * 0.5f));
   }
 
 }
@@ -194,7 +223,7 @@ void ScreamyBall::DrawObstacles() {
     cinder::ivec2 tri_pt_2 = {(loc.Row() - 1) * tile_size_,
                               loc.Col() * tile_size_};
 
-    cinder::ivec2 tri_pt_3 = {(loc.Row() - (0.5)) * tile_size_,
+    cinder::ivec2 tri_pt_3 = {(loc.Row() - 0.5) * tile_size_,
                               (loc.Col() - obstacle_height) * tile_size_};
 
     if (obstacle.GetObstacleType() == screamy_ball::ObstacleType::kHigh) {
@@ -206,9 +235,6 @@ void ScreamyBall::DrawObstacles() {
     cinder::gl::drawSolidTriangle(tri_pt_1, tri_pt_2, tri_pt_3);
     loc = {loc.Row() + 1, loc.Col()};
   }
-
-  // low obstacles
-
 
 }
 
@@ -259,9 +285,19 @@ void ScreamyBall::ParseUserInteraction(int event_code) {
       break;
     }
     case KeyEvent::KEY_r: {
-      ConfirmReset();
-      ResetGame();
+      state_ = GameState::kConfirmingReset;
       break;
+    }
+    case KeyEvent::KEY_y: {
+      if (state_ == GameState::kConfirmingReset) {
+        confirmed_reset_ = true;
+      }
+      break;
+    }
+    case KeyEvent::KEY_n: {
+      if (state_ == GameState::kConfirmingReset) {
+        state_ = GameState::kPlaying;
+      }
     }
     default: break;
   }
@@ -278,22 +314,48 @@ void ScreamyBall::keyUp(KeyEvent event) {
   }
 }
 
-bool ScreamyBall::ConfirmReset() {
-  const cinder::vec2 center = getWindowCenter();
-  const cinder::ivec2 size = {500, 50};
-  const Color color = Color::black();
-  const ColorA bg_color = ColorA::gray(0.5);
-  PrintText("Do you really want to reset the game?", color, size, center,
-      bg_color);
+void ScreamyBall::mouseDown(MouseEvent event) {
+  if (event.isShiftDown()) {
+    if (event.isLeftDown()) {
+      ParseUserInteraction(KeyEvent::KEY_p);
+    } else if (event.isRightDown()) {
+      ParseUserInteraction(KeyEvent::KEY_r);
+    }
+  } else {
+    if (event.isLeftDown()) {
+      ParseUserInteraction(KeyEvent::KEY_UP);
+    } else if (event.isRightDown()) {
+      ParseUserInteraction(KeyEvent::KEY_DOWN);
+    }
+  }
 
-  return false;
+  //TODO: Create pause and reset buttons, and finish confirm reset with mouse clicks and event.getPos()
+}
+
+void ScreamyBall::mouseUp(MouseEvent event) {
+  if (event.isRightDown()) {
+    engine_.state_ = BallState::kRolling;
+  }
+}
+
+void ScreamyBall::ConfirmReset() {
+  const cinder::vec2 center = getWindowCenter();
+  const cinder::ivec2 size = {500, 60};
+  const Color color = Color::white();
+  const ColorA bg_color = ColorA::gray(0.5);
+  PrintText("Do you really want to reset the game? Press y for yes, and n for no.", 30, color, size, center,
+      bg_color);
 }
 
 void ScreamyBall::ResetGame() {
-  if (!ConfirmReset()) return;
+  if (!confirmed_reset_) {
+    state_ = GameState::kPlaying;
+    return;
+  }
   engine_.Reset();
   paused_ = false;
   printed_game_over_ = false;
+  confirmed_reset_ = false;
   state_ = GameState::kPlaying;
   //time_left_ = 0;
   //top_players_.clear();
