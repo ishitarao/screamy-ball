@@ -14,7 +14,7 @@ Engine::Engine(const Location& ball_loc, int width, int height) :
     kWindowWidth(width),
     kWindowHeight(height),
     reached_max_height_(false),
-    obstacle_(ObstacleType::kLow, {ball_loc.Col(), kMinHeight}) {}
+    obstacle_(ObstacleType::kLow, {width, kMinHeight}) {}
 
 void Engine::Run() {
   if (HasCollided()) {
@@ -101,7 +101,9 @@ int Engine::GetMinHeight() {
   return kMinHeight;
 }
 
-void Engine::Reset() {
+void Engine::Reset(const Location& ball_loc) {
   state_ = BallState::kRolling;
+  ball_.location_ = ball_loc;
+  obstacle_.location_ = {kWindowWidth, kMinHeight};
 }
 }  // namespace screamy-ball

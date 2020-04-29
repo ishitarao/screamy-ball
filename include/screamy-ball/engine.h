@@ -28,7 +28,7 @@ class Engine {
   Obstacle GetObstacle();
   int GetMinHeight();
   bool HasCollided();
-  void Reset();
+  void Reset(const Location& ball_loc);
 
 };
 }

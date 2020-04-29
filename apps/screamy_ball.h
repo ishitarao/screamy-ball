@@ -32,17 +32,21 @@ class ScreamyBall : public cinder::app::App {
 
  private:
   void SetupRecognizer();
-  void SetupUI();
-  void RecognizeCommands(const std::string& msg);
-  void ParseUserInteraction(int event_code);
+  void SetupMainMenuUI();
+  void SetupInGameUI();
+
   void DrawMainMenu();
+  void DrawHelp();
   void DrawBackground();
-  void DrawButtons();
-  void DrawGameOver();
-  void ResetGame();
-  void ConfirmReset();
   void DrawBall();
   void DrawObstacles();
+  void DrawGameOver();
+  void DrawConfirmReset();
+
+  void RecognizeCommands(const std::string& msg);
+  void ParseUserInteraction(int event_code);
+
+  void ResetGame();
 
 
  private:
