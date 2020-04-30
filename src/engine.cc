@@ -72,9 +72,10 @@ Obstacle Engine::CreateObstacle() {
 }
 
 bool Engine::HasCollided() {
+  int obstacle_x = obstacle_.location_.Row();
+  int ball_x = ball_.location_.Row();
   // return false if the obstacle isn't within the range of the ball
-  if (obstacle_.location_.Row() - 1 > ball_.location_.Row()
-    || obstacle_.location_.Row() - 1 <= ball_.location_.Row() - obstacle_.length_) {
+  if (obstacle_x - 1 > ball_x || obstacle_x - 1 <= ball_x - obstacle_.length_) {
     return false;
   }
 
@@ -101,10 +102,10 @@ int Engine::GetMinHeight() {
   return kMinHeight;
 }
 
-void Engine::Reset(const Location& ball_loc) {
+void Engine::Reset() {
   state_ = BallState::kRolling;
   reached_max_height_ = false;
-  ball_.location_ = ball_loc;
+  ball_.location_ = {ball_.location_.Row(), kMinHeight};
   obstacle_.location_ = {kWindowWidth, kMinHeight};
 }
 }  // namespace screamy-ball

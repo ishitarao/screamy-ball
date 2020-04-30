@@ -18,6 +18,8 @@ Mouse Controls:
     Reset Game: Shift + Right click
 
 For mouse control, there will be buttons on the screen if you prefer playing that way.
+Note: If you want to duck, click on the duck button. To stop ducking, click on it again.
+      The other buttons are normal.
 
 The game supports spoken commands.
 Their processing is slow and potentially inaccurate, because that's the state of C++ NLP in 2020.
@@ -26,6 +28,8 @@ Speech Controls:
     Duck: Say "Lower"
     Pause: Say "Pause Game"
     Reset: Say "Reset Game"
+    Menu: Say "Main Menu"
+    Help: Say "Help Me"
 
 Why the commands can't just be "Jump", "Duck", "Pause", and "Reset", you ask?
 That's because NLP can't handle single-syllable commands.

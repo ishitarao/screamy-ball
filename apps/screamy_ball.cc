@@ -101,7 +101,11 @@ void ScreamyBall::SetupInGameUI() {
     ParseUserInteraction(KeyEvent::KEY_UP); });
 
   in_game_ui_->addButton("Duck", [&]() {
-    ParseUserInteraction(KeyEvent::KEY_DOWN); });
+    if (engine_.state_ == BallState::kDucking) {
+      engine_.state_ = BallState::kRolling;
+    } else {
+      engine_.state_ = BallState::kDucking;
+    } });
 
   in_game_ui_->addButton("Pause",[&]() { paused_ = !paused_; });
 
@@ -117,6 +121,7 @@ void ScreamyBall::SetupMainMenuUI() {
 
   //Start button: fires a lambda that starts the timer and the game when pressed
   menu_ui_->addButton("Start",[&]() {
+    engine_.Reset();
     last_state_ = state_;
     state_ = GameState::kPlaying;
     timer_.start(); });
@@ -153,7 +158,9 @@ void ScreamyBall::update() {
     case GameState::kPlaying: {
       if (paused_) return;
       if (timer_.isStopped()) {
-        timer_.resume();
+        if (last_state_ == GameState::kMenu) {
+          timer_.start();
+        } else timer_.resume();
       }
 
       const double current_time = timer_.getSeconds();
@@ -364,6 +371,10 @@ void ScreamyBall::RecognizeCommands(const std::string& message) {
     ParseUserInteraction(KeyEvent::KEY_p);
   } else if (message == "reset game") {
     ParseUserInteraction(KeyEvent::KEY_r);
+  } else if (message == "main menu") {
+    ParseUserInteraction(KeyEvent::KEY_m);
+  } else if (message == "help me") {
+    ParseUserInteraction(KeyEvent::KEY_h);
   }
 }
 
@@ -439,6 +450,19 @@ void ScreamyBall::ParseUserInteraction(int event_code) {
       }
       break;
     }
+    case KeyEvent::KEY_m: {
+      last_state_ = state_;
+      state_ = GameState::kMenu;
+      timer_.stop();
+      engine_.Reset();
+      break;
+    }
+    case KeyEvent::KEY_h: {
+      last_state_ = state_;
+      state_ = GameState::kHelp;
+      timer_.stop();
+      break;
+    }
 
     case KeyEvent::KEY_r: {
       last_state_ = state_;
@@ -464,7 +488,7 @@ void ScreamyBall::ParseUserInteraction(int event_code) {
 /* --------------------------------Reset------------------------------------- */
 
 void ScreamyBall::ResetGame() {
-  engine_.Reset({2, static_cast<int>(kHeight - 2)});
+  engine_.Reset();
   paused_ = false;
   printed_game_over_ = false;
   confirmed_reset_ = false;
