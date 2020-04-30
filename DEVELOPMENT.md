@@ -30,7 +30,11 @@
 - **4/26/20**
   - Integrated speech recognition with the game
 - **4/27/20**
-  - Added support for PretzelGui to the project
   - Integrated mouse control with the game
+- **4/28/20**
+  - Added a UI for the main menu using Cinder Parameters
+- **4/29/20**
+  - Added the ability to reset the game at any time
+  - Created a Main Menu
   
 ---

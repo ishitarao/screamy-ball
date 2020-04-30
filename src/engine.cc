@@ -103,6 +103,7 @@ int Engine::GetMinHeight() {
 
 void Engine::Reset(const Location& ball_loc) {
   state_ = BallState::kRolling;
+  reached_max_height_ = false;
   ball_.location_ = ball_loc;
   obstacle_.location_ = {kWindowWidth, kMinHeight};
 }

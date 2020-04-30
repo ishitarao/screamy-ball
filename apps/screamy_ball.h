@@ -48,18 +48,24 @@ class ScreamyBall : public cinder::app::App {
 
   void ResetGame();
 
-
  private:
-  screamy_ball::Engine engine_;
-  GameState state_;
+  const size_t kTileSize;
+  const size_t kHeight;
+  const size_t kWidth;
+  const size_t kDefaultFontSize;
+  const size_t kTextBoxBuffer;
+  const float kLocMultiplier;
+
   bool printed_game_over_;
   bool paused_;
   bool confirmed_reset_;
-  int tile_size_;
-  int height_;
-  int width_;
   double delay_secs_;
-  double last_time_;
+  double last_update_secs_;
+
+  screamy_ball::Engine engine_;
+  GameState state_;
+  GameState last_state_;
+
   cinder::Timer timer_;
   sphinx::RecognizerRef recognizer_;
   cinder::params::InterfaceGlRef menu_ui_;

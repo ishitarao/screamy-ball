@@ -8,12 +8,14 @@
 #include <cinder/gl/draw.h>
 #include <cinder/gl/gl.h>
 #include <gflags/gflags.h>
+#include <cmath>
 
 namespace screamyball_app {
 
 using cinder::Color;
 using cinder::ColorA;
 using cinder::TextBox;
+using cinder::ivec2;
 using cinder::app::KeyEvent;
 using cinder::app::MouseEvent;
 using cinder::params::InterfaceGl;
@@ -43,17 +45,20 @@ DECLARE_uint32(tilesize);
 DECLARE_double(delay_secs);
 
 ScreamyBall::ScreamyBall()
-    : engine_({2, static_cast<int>(FLAGS_height - 2)},
+    : kTileSize(FLAGS_tilesize),
+      kHeight(FLAGS_height),
+      kWidth(FLAGS_width),
+      kDefaultFontSize(30),
+      kTextBoxBuffer(10),
+      kLocMultiplier(0.5),
+      engine_({2, static_cast<int>(FLAGS_height - 2)},
         FLAGS_width, FLAGS_height),
+      state_{GameState::kMenu},
       printed_game_over_(false),
       paused_(false),
       confirmed_reset_(false),
-      state_{GameState::kMenu},
-      tile_size_(FLAGS_tilesize),
-      height_(FLAGS_height),
-      width_(FLAGS_width),
       delay_secs_(FLAGS_delay_secs),
-      last_time_(0.00) {}
+      last_update_secs_(0.00) {}
 
 void ScreamyBall::setup() {
   cinder::gl::enableDepthWrite();
@@ -82,16 +87,17 @@ void ScreamyBall::SetupRecognizer() {
 }
 
 void ScreamyBall::SetupInGameUI() {
-  in_game_ui_ = InterfaceGl::create(getWindow(), "In-Game UI",
+  in_game_ui_ = InterfaceGl::create(getWindow(), "Options",
                                     cinder::app::toPixels(
-                                        cinder::ivec2(200, 400)));
+                                        ivec2(200, 400)));
 
-  in_game_ui_->addButton("Menu",
-      [&]() { state_ = GameState::kMenu; });
-  in_game_ui_->addButton("Pause",
-      [&]() { paused_ = !paused_; });
-  in_game_ui_->addButton("Reset",
-      [&]() { state_ = GameState::kConfirmingReset; });
+  in_game_ui_->addButton("Menu",[&]() {
+    last_state_ = state_;
+    state_ = GameState::kMenu; });
+  in_game_ui_->addButton("Pause",[&]() { paused_ = !paused_; });
+  in_game_ui_->addButton("Reset",[&]() {
+    last_state_ = state_;
+    state_ = GameState::kConfirmingReset; });
 
   in_game_ui_->show();
 }
@@ -99,18 +105,21 @@ void ScreamyBall::SetupInGameUI() {
 void ScreamyBall::SetupMainMenuUI() {
   menu_ui_ = InterfaceGl::create(getWindow(), "Main Menu",
                                  cinder::app::toPixels(
-                                     cinder::ivec2(200, 400)));
-
+                                     ivec2(200, 400)));
 
   //Start button: fires a lambda that starts the timer and the game when pressed
   menu_ui_->addButton("Start",[&]() {
+    last_state_ = state_;
     state_ = GameState::kPlaying;
     timer_.start(); });
 
-  menu_ui_->addButton("Help",
-      [&]() { state_ = GameState::kHelp; });
-  menu_ui_->addButton("Reset",
-      [&]() { state_ = GameState::kConfirmingReset; });
+  menu_ui_->addButton("Help",[&]() {
+    last_state_ = state_;
+    state_ = GameState::kHelp; });
+
+  menu_ui_->addButton("Reset",[&]() {
+    last_state_ = state_;
+    state_ = GameState::kConfirmingReset; });
 
   //mParams->addButton( "Leaderboard", bind( &TweakBarApp::button, this ) );
 }
@@ -138,12 +147,13 @@ void ScreamyBall::update() {
       }
 
       const double current_time = timer_.getSeconds();
-      if (current_time - last_time_ >= delay_secs_) {
+      if (current_time - last_update_secs_ >= delay_secs_) {
         engine_.Run();
         if (engine_.state_ == BallState::kCollided) {
+          last_state_ = state_;
           state_ = GameState::kGameOver;
         }
-        last_time_ = current_time;
+        last_update_secs_ = current_time;
       }
       break;
     }
@@ -167,7 +177,8 @@ void ScreamyBall::draw() {
   cinder::gl::enableAlphaBlending();
 
   menu_ui_->hide();
-  in_game_ui_->hide();
+  in_game_ui_->setOptions("Pause", "visible=false");
+  in_game_ui_->show();
 
   switch (state_) {
     case GameState::kGameOver: {
@@ -176,6 +187,7 @@ void ScreamyBall::draw() {
     }
     case GameState::kMenu: {
       menu_ui_->show();
+      in_game_ui_->hide();
       DrawMainMenu();
       break;
     }
@@ -188,7 +200,7 @@ void ScreamyBall::draw() {
       break;
     }
     case GameState::kPlaying: {
-      in_game_ui_->show();
+      in_game_ui_->setOptions("Pause", "visible=true");
       if (paused_) return;
       DrawBackground();
       DrawBall();
@@ -203,7 +215,7 @@ void ScreamyBall::draw() {
 
 template <typename C>
 void PrintText(const string& text, float font_size, const C& color,
-               const cinder::ivec2& size, const cinder::vec2& loc,
+               const ivec2& size, const cinder::vec2& loc,
                const ColorA& bg_color = ColorA::zero()) {
   cinder::gl::color(color);
 
@@ -224,10 +236,14 @@ void PrintText(const string& text, float font_size, const C& color,
 
 void ScreamyBall::DrawMainMenu() {
   DrawBackground();
-  const cinder::vec2 center = getWindowCenter();
-  const cinder::ivec2 size = {500, 50};
+  const ivec2 center = getWindowCenter();
+  const ivec2 size = {kTileSize * 4, kTileSize * 2};
   const Color color = Color::white();
-  PrintText("Screamy Ball", 30, color, size, center);
+  PrintText("Screamy Ball", kDefaultFontSize, color, size, center);
+
+  menu_ui_->setPosition({center.x - kTileSize * 2,
+                         center.y + kTileSize});
+  menu_ui_->setSize(size);
 }
 
 void ScreamyBall::DrawHelp() {
@@ -240,8 +256,8 @@ void ScreamyBall::DrawBackground() {
   // draw the ground:
   int ground_height = engine_.GetMinHeight();
   cinder::gl::color(Color::white());
-  const cinder::ivec2 upper_left = {0, tile_size_ * ground_height};
-  const cinder::ivec2 bottom_right = {width_ * tile_size_, tile_size_ * height_};
+  const ivec2 upper_left = {0, kTileSize * ground_height};
+  const ivec2 bottom_right = {kWidth * kTileSize, kTileSize * kHeight};
   cinder::gl::drawSolidRect(cinder::Rectf(upper_left, bottom_right));
 }
 
@@ -251,28 +267,30 @@ void ScreamyBall::DrawGameOver() {
 
   cinder::gl::clear(Color::black());
   const cinder::vec2 center = getWindowCenter();
-  const cinder::ivec2 size = {500, 50};
+  const ivec2 size = {500, 50};
   const Color color = Color::white();
   string elapsed_time = PrettyPrintElapsedTime(timer_.getSeconds());
-  PrintText("Your time: " + elapsed_time, 30, color, size, center);
+  PrintText("Your time: " + elapsed_time, kDefaultFontSize, color, size, center);
 
   printed_game_over_ = true;
 }
 
 void ScreamyBall::DrawBall() {
-  // TODO: Get rid of the magic numbers and make this look more readable
   const Location loc = engine_.GetBall().location_;
+  const float multiplier_cubed = pow(kLocMultiplier, 3);
+  const float center_x = (loc.Row() + kLocMultiplier) * kTileSize;
+  const float radius_x = (float)kTileSize * kLocMultiplier;
   cinder::gl::color(Color(1, 0, 0));
 
   if (engine_.state_ == BallState::kDucking) {
-    const cinder::ivec2 ellipse_center = {(loc.Row() + 0.5) * tile_size_,
-                                          (loc.Col() - 0.125) * tile_size_};
-    cinder::gl::drawSolidEllipse(ellipse_center,
-        ((float)tile_size_ * 0.5f), ((float)tile_size_ * 0.125f));
+    const ivec2 ellipse_center = { center_x, (loc.Col() - multiplier_cubed)
+                                          * kTileSize };
+    cinder::gl::drawSolidEllipse(ellipse_center, radius_x,
+        ((float)kTileSize * multiplier_cubed));
   } else {
-    const cinder::ivec2 circle_center = {(loc.Row() + 0.5) * tile_size_,
-                                         (loc.Col() - 0.5) * tile_size_};
-    cinder::gl::drawSolidCircle(circle_center, ((float)tile_size_ * 0.5f));
+    const ivec2 circle_center = { center_x, (loc.Col() - kLocMultiplier)
+                                         * kTileSize };
+    cinder::gl::drawSolidCircle(circle_center, radius_x);
   }
 
 }
@@ -282,22 +300,23 @@ void ScreamyBall::DrawObstacles() {
   screamy_ball::Obstacle obstacle = engine_.GetObstacle();
   Location loc = obstacle.location_;
   const int obstacle_height = obstacle.GetHeight();
-  cinder::gl::color(Color::gray(0.5));
+  const float loc_incr = kTileSize * kLocMultiplier;
+
+  cinder::gl::color(Color::gray(0.5)); //the % of grey
 
   //create spikes
   for (int counter = 0; counter < obstacle.length_; counter++) {
-    cinder::ivec2 tri_pt_1 = {loc.Row() * tile_size_,
-                              loc.Col() * tile_size_};
-    cinder::ivec2 tri_pt_2 = {(loc.Row() - 1) * tile_size_,
-                              loc.Col() * tile_size_};
+    ivec2 tri_pt_1 = {loc.Row() * kTileSize, loc.Col() * kTileSize};
+    ivec2 tri_pt_2 = {(loc.Row() - 1) * kTileSize,
+                      loc.Col() * kTileSize};
 
-    cinder::ivec2 tri_pt_3 = {(loc.Row() - 0.5) * tile_size_,
-                              (loc.Col() - obstacle_height) * tile_size_};
+    ivec2 tri_pt_3 = {(loc.Row() - kLocMultiplier) * kTileSize,
+                              (loc.Col() - obstacle_height) * kTileSize};
 
     if (obstacle.GetObstacleType() == screamy_ball::ObstacleType::kHigh) {
-      tri_pt_1.y += tile_size_ / 2;
-      tri_pt_2.y += tile_size_ / 2;
-      tri_pt_3.y = (loc.Col() + obstacle_height) * tile_size_ + tile_size_ / 2;
+      tri_pt_1.y += loc_incr;
+      tri_pt_2.y += loc_incr;
+      tri_pt_3.y = (float)(loc.Col() + obstacle_height) * kTileSize + loc_incr;
     }
 
     cinder::gl::drawSolidTriangle(tri_pt_1, tri_pt_2, tri_pt_3);
@@ -327,16 +346,18 @@ void ScreamyBall::ParseUserInteraction(int event_code) {
     case KeyEvent::KEY_UP:
     case KeyEvent::KEY_k:
     case KeyEvent::KEY_w: {
-      if (paused_) {
+      if (paused_ || state_ != GameState::kPlaying) {
         return;
       }
       engine_.state_ = BallState::kJumping;
       break;
     }
+
     case KeyEvent::KEY_DOWN:
     case KeyEvent::KEY_j:
     case KeyEvent::KEY_s: {
-      if (paused_ || engine_.state_ == BallState::kJumping) {
+      if (paused_ || engine_.state_ == BallState::kJumping
+        || state_ != GameState::kPlaying) {
         return;
       }
       engine_.state_ = BallState::kDucking;
@@ -344,6 +365,9 @@ void ScreamyBall::ParseUserInteraction(int event_code) {
     }
 
     case KeyEvent::KEY_p: {
+      if (state_ != GameState::kPlaying) {
+        return;
+      }
       paused_ = !paused_;
       if (paused_) {
         timer_.stop();
@@ -352,7 +376,9 @@ void ScreamyBall::ParseUserInteraction(int event_code) {
       }
       break;
     }
+
     case KeyEvent::KEY_r: {
+      last_state_ = state_;
       state_ = GameState::kConfirmingReset;
       break;
     }
@@ -364,8 +390,9 @@ void ScreamyBall::ParseUserInteraction(int event_code) {
     }
     case KeyEvent::KEY_n: {
       if (state_ == GameState::kConfirmingReset) {
-        state_ = GameState::kPlaying;
+        state_ = last_state_;
       }
+      break;
     }
     default: break;
   }
@@ -398,8 +425,6 @@ void ScreamyBall::mouseDown(MouseEvent event) {
       ParseUserInteraction(KeyEvent::KEY_DOWN);
     }
   }
-
-  //TODO: Create pause and reset buttons, and finish confirm reset with mouse clicks and event.getPos()
 }
 
 void ScreamyBall::mouseUp(MouseEvent event) {
@@ -410,24 +435,25 @@ void ScreamyBall::mouseUp(MouseEvent event) {
 
 void ScreamyBall::DrawConfirmReset() {
   const cinder::vec2 center = getWindowCenter();
-  const cinder::ivec2 size = {500, 60};
+  //2 is to signify 2 lines:
+  const ivec2 size = {500, kDefaultFontSize * 2 + kTextBoxBuffer};
   const Color color = Color::white();
-  const ColorA bg_color = ColorA::gray(0.5);
-  PrintText("Do you really want to reset the game? Press y for yes, and n for no.", 30, color, size, center,
-      bg_color);
+  const ColorA bg_color = ColorA::gray(0.75);
+
+  PrintText("Do you really want to reset the game? "
+            "Press y for yes, and n for no.", kDefaultFontSize, color, size, center,
+            bg_color);
 }
 
 void ScreamyBall::ResetGame() {
-  if (!confirmed_reset_) {
-    state_ = GameState::kPlaying;
-    return;
-  }
-  engine_.Reset({2, height_ - 2});
+  engine_.Reset({2, static_cast<int>(kHeight - 2)});
   paused_ = false;
   printed_game_over_ = false;
   confirmed_reset_ = false;
+  last_state_ = state_;
   state_ = GameState::kMenu;
-  //time_left_ = 0;
+  timer_.stop();
+  last_update_secs_ = 0.00;
   //top_players_.clear();
   //current_player_top_scores_.clear();
 }
