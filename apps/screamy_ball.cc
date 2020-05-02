@@ -275,19 +275,18 @@ void ScreamyBall::DrawHelp() {
   const ivec2 pos = {getWindowCenter().x, getWindowPosY()};
   const ivec2 size = {kWidth * kTileSize, kTileSize};
   const Color color = Color::white();
-  float_t row = 0;
+  size_t row = 0;
 
-  ci::fs::path help_path = ci::app::getAssetPath("help.txt");
-  auto input_stream = cinder::loadFileStream(help_path);
+  auto input_stream = cinder::loadFileStream(ci::app::getAssetPath(
+      "help.txt"));
 
-  PrintText(input_stream->readLine(), kDefaultFontSize, color, size,
-            {pos.x, pos.y + (++row) * kTileSize});
+  PrintText(input_stream->readLine(), kDefaultFontSize, color, size, pos);
 
-  row++;
   while (!input_stream->isEof()) {
-    PrintText(input_stream->readLine(), 20, color, size,
-        {pos.x, pos.y + row * kTileSize});
-    row++;
+    // The font is half the tile size
+    PrintText(input_stream->readLine(),
+        ((float)(kTileSize - kTextBoxBuffer) / 2), color, size,
+        {pos.x, pos.y + (++row) * kTileSize});
   }
 }
 
