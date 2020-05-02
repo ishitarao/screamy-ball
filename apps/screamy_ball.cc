@@ -339,10 +339,13 @@ void ScreamyBall::DrawObstacles() {
     ivec2 tri_pt_3 = {(loc.Row() - kLocMultiplier) * kTileSize,
                               (loc.Col() - obstacle_height) * kTileSize};
 
+    // increment location if it's a 'high' obstacle
     if (obstacle.GetObstacleType() == screamy_ball::ObstacleType::kHigh) {
       tri_pt_1.y += loc_incr;
       tri_pt_2.y += loc_incr;
       tri_pt_3.y = (float)(loc.Col() + obstacle_height) * kTileSize + loc_incr;
+      cinder::gl::drawSolidRect(cinder::Rectf(tri_pt_1,
+          {tri_pt_2.x, 0}));
     }
 
     cinder::gl::drawSolidTriangle(tri_pt_1, tri_pt_2, tri_pt_3);

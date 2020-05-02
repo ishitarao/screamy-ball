@@ -26,7 +26,7 @@
   - Added a ground
   - Need to do:
     - [x] Begin working on speech recognition
-    - [ ] Ensure that the 'high' spikes aren't just floating in mid air
+    - [x] Ensure that the 'high' spikes aren't just floating in mid air
 - **4/26/20**
   - Integrated speech recognition with the game
 - **4/27/20**
