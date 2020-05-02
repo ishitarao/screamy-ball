@@ -36,7 +36,7 @@ const char kDifferentFont[] = "Purisa";
 #else
 const char kNormalFont[] = "Arial";
 const char kBoldFont[] = "Arial Bold";
-const char kDifferentFont[] = "Papyrus";
+const char kDifferentFont[] = "Courier New Bold";
 #endif
 
 DECLARE_uint32(width);
@@ -245,7 +245,7 @@ void PrintText(const string& text, float font_size, const C& color,
 
   auto box = TextBox()
       .alignment(TextBox::CENTER)
-      .font(cinder::Font(kNormalFont, font_size))
+      .font(cinder::Font(kDifferentFont, font_size))
       .size(size)
       .color(color)
       .backgroundColor(bg_color)
@@ -271,7 +271,24 @@ void ScreamyBall::DrawMainMenu() {
 }
 
 void ScreamyBall::DrawHelp() {
-  DrawBackground();
+  cinder::gl::clear(Color::black());
+  const ivec2 pos = {getWindowCenter().x, getWindowPosY()};
+  const ivec2 size = {kWidth * kTileSize, kTileSize};
+  const Color color = Color::white();
+  float_t row = 0;
+
+  ci::fs::path help_path = ci::app::getAssetPath("help.txt");
+  auto input_stream = cinder::loadFileStream(help_path);
+
+  PrintText(input_stream->readLine(), kDefaultFontSize, color, size,
+            {pos.x, pos.y + (++row) * kTileSize});
+
+  row++;
+  while (!input_stream->isEof()) {
+    PrintText(input_stream->readLine(), 20, color, size,
+        {pos.x, pos.y + row * kTileSize});
+    row++;
+  }
 }
 
 void ScreamyBall::DrawBackground() {

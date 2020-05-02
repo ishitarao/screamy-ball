@@ -35,6 +35,8 @@
   - Added a UI for the main menu using Cinder Parameters
 - **4/29/20**
   - Added the ability to reset the game at any time
-  - Created a Main Menu
+  - Created a Main Menu and an in-game GUI
+- **5/1/20**
+  - Added a help page
   
 ---
