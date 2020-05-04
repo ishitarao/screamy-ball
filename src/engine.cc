@@ -5,6 +5,7 @@
 #include <random>
 
 namespace screamy_ball {
+using std::mt19937;
 
 Engine::Engine(const Location& ball_loc, int width, int height) :
     state_(BallState::kRolling),
@@ -14,14 +15,13 @@ Engine::Engine(const Location& ball_loc, int width, int height) :
     kWindowWidth(width),
     kWindowHeight(height),
     reached_max_height_(false),
-    obstacle_(ObstacleType::kLow, {width, kMinHeight}) {}
+    obstacle_(ObstacleType::kLow, { width, kMinHeight }) {}
 
 void Engine::Run() {
   if (HasCollided()) {
     state_ = BallState::kCollided;
     return;
   }
-
   CreateObstacle();
   if (state_ == BallState::kJumping) {
     Jump();
@@ -30,13 +30,15 @@ void Engine::Run() {
 
 void Engine::Jump() {
   if (reached_max_height_) {
-    ball_.location_ = {ball_.location_.Row(), ball_.location_.Col() + 1};
+    ball_.location_ = {ball_.location_.Row(), ball_.location_.Col()
+                       + 1 };
     if (ball_.location_.Col() == kMinHeight) {
       reached_max_height_ = false;
       state_ = BallState::kRolling;
     }
   } else {
-    ball_.location_ = {ball_.location_.Row(), ball_.location_.Col() - 1};
+    ball_.location_ = { ball_.location_.Row(), ball_.location_.Col()
+                       - 1 };
     if (ball_.location_.Col() == kMaxHeight) {
       reached_max_height_ = true;
     }
@@ -53,17 +55,23 @@ Obstacle Engine::CreateObstacle() {
     return obstacle_;
   }
 
-  // generate a random obstacle length and a random obstacle type
   std::random_device dev;
-  std::mt19937 rng(dev());
-  std::uniform_int_distribution<std::mt19937::result_type> rand_length(2,4);
-  std::uniform_int_distribution<std::mt19937::result_type> rand_bool(0,1);
+  mt19937 rng(dev());
 
-  ObstacleType type = rand_bool(rng) ? ObstacleType::kHigh : ObstacleType::kLow;
+ // generate a random obstacle length (number of spikes)
+  std::uniform_int_distribution<mt19937::result_type> rand_length(
+      obstacle_.kMinLength, obstacle_.kMaxLength);
+
+  // generate a random obstacle type (high or low)
+  std::uniform_int_distribution<mt19937::result_type> rand_bool(0,1);
+
+  ObstacleType type = rand_bool(rng) ? ObstacleType::kHigh :
+      ObstacleType::kLow;
   if (type == ObstacleType::kHigh) {
-    obstacle_.location_ = {kWindowWidth, kMinHeight - obstacle_.GetHeight() - 1};
+    obstacle_.location_ = { kWindowWidth, kMinHeight
+                           - obstacle_.kHeight - 1 };
   } else {
-    obstacle_.location_ = {kWindowWidth, kMinHeight};
+    obstacle_.location_ = { kWindowWidth, kMinHeight };
   }
   obstacle_.type_ = type;
   obstacle_.length_ = rand_length(rng);
@@ -83,9 +91,10 @@ bool Engine::HasCollided() {
     case ObstacleType::kHigh: {
       return state_ != BallState::kDucking;
     }
+
     case ObstacleType::kLow: {
       return ball_.location_.Col()
-        >= kMinHeight - obstacle_.GetHeight();
+        >= kMinHeight - obstacle_.kHeight;
     }
   }
 }
@@ -105,7 +114,7 @@ int Engine::GetMinHeight() {
 void Engine::Reset() {
   state_ = BallState::kRolling;
   reached_max_height_ = false;
-  ball_.location_ = {ball_.location_.Row(), kMinHeight};
-  obstacle_.location_ = {kWindowWidth, kMinHeight};
+  ball_.location_ = { ball_.location_.Row(), kMinHeight };
+  obstacle_.location_ = { kWindowWidth, kMinHeight };
 }
 }  // namespace screamy-ball

@@ -2,5 +2,5 @@ higher/1e-10/
 lower/1e-10/
 pause game/1e-30/
 reset game/1e-30/
-main menu/1e-30/
-help me/1e-30/
+main menu/1e-50/
+help me/1e-25/
