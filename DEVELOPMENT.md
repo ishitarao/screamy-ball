@@ -38,12 +38,11 @@
   - Created a Main Menu and an in-game GUI
 - **5/1/20**
   - Added a help page
-- **5/2/20**
+- **5/4/20**
+  - Add README and PROPOSAL files
   - Need to do:
     - [ ] Improve speech recognition
-    - [ ] Add more controls to the confirm reset page
     - [ ] Add music
     - [ ] Add tests
-    - [ ] README and PROPOSAL
   
 ---

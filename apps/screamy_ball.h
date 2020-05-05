@@ -87,6 +87,8 @@ class ScreamyBall : public cinder::app::App {
 
 };
 
+string PrettyPrintElapsedTime(double time_secs);
+
 }  // namespace screamyball_app
 
 #endif  // FINALPROJECT_APPS_SCREAMYBALL_H_

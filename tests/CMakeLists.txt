@@ -9,14 +9,14 @@ file(GLOB SOURCE_LIST CONFIGURE_DEPENDS
 
 
 ci_make_app(
-        APP_NAME    test
+        APP_NAME    engine_test
         CINDER_PATH ${CINDER_PATH}
         SOURCES     ${SOURCE_LIST}
-        LIBRARIES   mylibrary catch2
+        LIBRARIES   screamy-ball catch2
         BLOCKS
 )
 
-target_compile_features(test PRIVATE cxx_std_14)
+target_compile_features(engine_test PRIVATE cxx_std_14)
 
 # Cross-platform compiler lints
 if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang"

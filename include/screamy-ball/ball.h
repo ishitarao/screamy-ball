@@ -15,10 +15,9 @@ enum class BallState {
   kCollided
 };
 
-class Ball {
- public:
+struct Ball {
   Ball(const Location& location) : location_(location) {}
-  Location location_; //confirm if this is okay
+  Location location_;
 };
 
 }

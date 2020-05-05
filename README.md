@@ -16,15 +16,19 @@ can be controlled in 3 ways:
 1. The keyboard
 1. Spoken commands
 
-### Background knowledge I have on the project
-I know how to work with the Cinder library to create graphics for the game, and I know how to use Cinder to add keyboard 
-and mouse control to the game. 
+###Dependencies
+* [Cinder](https://github.com/cinder/Cinder)
+* [ciSpeech](https://github.com/Hebali/ciSpeech) (provides Cinder support for 
+                                                  [CMU PocketSphinx](http://cmusphinx.sourceforge.net/), a speech 
+                                                  recognizer written in C++)
+* [gflags](https://github.com/gflags/gflags)
+* [clang](https://cmake.org/)
+                                                                                            
+Due to compatibility issues with ciSpeech, you will require Mac OS for the game to work.
 
-### Why I want to do the project
-I have lots of memories of playing the T. Rex Game for hours when the internet connection at my house got cut out, so I 
-thought it would be fun to recreate the game. Also, I’m very interested in Natural Language Processing in general, and 
-I wanted to incorporate speech recognition into my game to get some hands-on practice with an NLP library.
+###The Game
+The aim of the game is for the ball to dodge the spikes, either by jumping, or by ducking. This goes on until the ball 
+eventually hits the spikes. Once the game is over, you will be informed of how long you lasted.
 
-### External Library
-For this project, I will be using a Cinder Block: [ciSpeech](https://github.com/Hebali/ciSpeech). It provides Cinder 
-support for [CMU PocketSphinx](http://cmusphinx.sourceforge.net/), a speech recognizer written in C++. 
+To start playing the game, you just click on the start button in the menu. For information on the controls, you can 
+click on the help button. Resetting the game resets the game state.

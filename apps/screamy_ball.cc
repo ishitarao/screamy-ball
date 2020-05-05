@@ -15,7 +15,7 @@ using cinder::Color;
 using cinder::TextBox;
 using cinder::app::KeyEvent;
 using cinder::app::MouseEvent;
-using cinder::app:toPixels;
+using cinder::app::toPixels;
 using cinder::params::InterfaceGl;
 using ci::fs::path;
 using screamy_ball::BallState;
@@ -342,7 +342,7 @@ void ScreamyBall::DrawBackground() {
   cinder::gl::clear(Color::black());
 
   // draw the ground:
-  int ground_height = engine_.GetMinHeight();
+  int ground_height = engine_.kMinHeight;
   cinder::gl::color(Color::white());
   const ivec2 upper_left = {0, kTileSize * ground_height};
   const ivec2 bottom_right = {kWidth * kTileSize, kTileSize * kHeight};
@@ -353,7 +353,7 @@ void ScreamyBall::DrawBackground() {
  * Draws the ball in two states: normally, and while ducking.
  */
 void ScreamyBall::DrawBall() {
-  const Location loc = engine_.GetBall().location_;
+  const Location loc = engine_.ball_.location_;
   const float multiplier_cubed = pow(kLocMultiplier, 3);
   const float center_x = (loc.Row() + kLocMultiplier) * kTileSize;
   const float radius_x = (float)kTileSize * kLocMultiplier;
@@ -379,7 +379,7 @@ void ScreamyBall::DrawBall() {
  * the ball is supposed to jump over.
  */
 void ScreamyBall::DrawObstacles() {
-  screamy_ball::Obstacle obstacle = engine_.GetObstacle();
+  screamy_ball::Obstacle obstacle = engine_.obstacle_;
   Location loc = obstacle.location_;
   const int obstacle_height = obstacle.kHeight;
   const float loc_incre = kTileSize * kLocMultiplier;
@@ -398,7 +398,7 @@ void ScreamyBall::DrawObstacles() {
                               (loc.Col() - obstacle_height) * kTileSize};
 
     // increment location if it's a 'high' obstacle
-    if (obstacle.GetObstacleType() == screamy_ball::ObstacleType::kHigh) {
+    if (obstacle.type_ == screamy_ball::ObstacleType::kHigh) {
       point_1.y += loc_incre;
       point_2.y += loc_incre;
       point_3.y = (float) (loc.Col() + obstacle_height) * kTileSize + loc_incre;
@@ -548,7 +548,6 @@ void ScreamyBall::ParseUserInteraction(int event_code) {
   if (state_ == GameState::kPlaying && IsInGameInteraction(event_code)) {
       return;
   }
-
   switch (event_code) {
     case KeyEvent::KEY_m: {
       last_state_ = state_;
