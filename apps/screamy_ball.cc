@@ -48,6 +48,7 @@ ScreamyBall::ScreamyBall()
       kDefaultFontSize(30),
       kTextBoxBuffer(10),
       kLocMultiplier(0.5),
+      kDefaultVolume(0.5),
       kUiDimensions({ FLAGS_tilesize * 4, FLAGS_tilesize * 5}),
       engine_({2, static_cast<int>(FLAGS_height - 2)},
         FLAGS_width, FLAGS_height),
@@ -57,7 +58,9 @@ ScreamyBall::ScreamyBall()
       confirmed_reset_(false),
       delay_secs_(FLAGS_delay_secs),
       last_update_secs_(0.00),
-      timer_(false) {}
+      timer_(false),
+      bg_music_("pokemon_battle_music.mp3"), // same mood
+      scream_audio_("scream_audio.mp3") {}
 
 /* ------------------------------Set Up-------------------------------------- */
 
@@ -68,9 +71,14 @@ void ScreamyBall::setup() {
   cinder::gl::enableDepthWrite();
   cinder::gl::enableDepthRead();
   SetupRecognizer();
-  SetupMainMenuUI();
-  SetupInGameUI();
-  SetupGeneralUI();
+
+  SetupMainMenuUi();
+  SetupInGameUi();
+  SetupGeneralUi();
+
+  SetupMusic(bg_music_);
+  SetupMusic(scream_audio_);
+  bg_music_.audio_obj_->start();
 }
 
 /**
@@ -100,7 +108,7 @@ void ScreamyBall::SetupRecognizer() {
  * Initialises in-game UI, which will be displayed everywhere except the main
  * menu.
  */
-void ScreamyBall::SetupInGameUI() {
+void ScreamyBall::SetupInGameUi() {
   in_game_ui_ = InterfaceGl::create(getWindow(), "Game Options",
                                     toPixels(kUiDimensions));
 
@@ -124,18 +132,20 @@ void ScreamyBall::SetupInGameUI() {
   in_game_ui_->addButton("Reset",[&]() {
     last_state_ = state_;
     state_ = GameState::kConfirmingReset; });
+
+  in_game_ui_->addButton("Mute",
+      std::bind(&ScreamyBall::Mute,this));
 }
 
 /**
  * Initializes the Main Menu UI.
  */
-void ScreamyBall::SetupMainMenuUI() {
+void ScreamyBall::SetupMainMenuUi() {
   menu_ui_ = InterfaceGl::create(getWindow(), "Main Menu",
                                  toPixels(kUiDimensions));
 
   //Start button: fires a lambda that starts the timer and the game when pressed
   menu_ui_->addButton("Start",[&]() {
-    ResetGame();
     last_state_ = state_;
     state_ = GameState::kPlaying; });
 
@@ -146,9 +156,15 @@ void ScreamyBall::SetupMainMenuUI() {
   menu_ui_->addButton("Reset",[&]() {
     last_state_ = state_;
     state_ = GameState::kConfirmingReset; });
+
+  menu_ui_->addButton("Mute",
+      std::bind(&ScreamyBall::Mute,this));
 }
 
-void ScreamyBall::SetupGeneralUI() {
+/**
+ * Initalises general UI for all other game states.
+ */
+void ScreamyBall::SetupGeneralUi() {
   general_ui_ = InterfaceGl::create(getWindow(), "Options",
                                  toPixels(kUiDimensions));
 
@@ -160,6 +176,22 @@ void ScreamyBall::SetupGeneralUI() {
   general_ui_->addButton("Reset",[&]() {
     last_state_ = state_;
     state_ = GameState::kConfirmingReset; });
+
+  general_ui_->addButton("Mute",
+      std::bind(&ScreamyBall::Mute,this));
+}
+
+/**
+ * Initialises the music.
+ * @param audio Audio object that contains the asset path and the VoiceRef
+ * object.
+ */
+void ScreamyBall::SetupMusic(Audio& audio) {
+  cinder::audio::SourceFileRef music_source = cinder::audio::load(
+      cinder::app::loadAsset(audio.asset_name_));
+
+  audio.audio_obj_ = cinder::audio::Voice::create(music_source);
+  audio.audio_obj_->setVolume(kDefaultVolume);
 }
 
 /* --------------------------------Update------------------------------------ */
@@ -168,6 +200,11 @@ void ScreamyBall::SetupGeneralUI() {
  * Cinder's standard update function.
  */
 void ScreamyBall::update() {
+  // loop audio
+  if (!bg_music_.audio_obj_->isPlaying()) {
+    bg_music_.audio_obj_->start();
+  }
+
   switch (state_) {
     case GameState::kPlaying: {
       if (paused_) {
@@ -188,14 +225,14 @@ void ScreamyBall::update() {
       if (confirmed_reset_) {
         ResetGame();
       }
-      return;
+      break;
     }
     //in all other cases, there is nothing to update.
     default: {
       if (!timer_.isStopped()) {
         timer_.stop();
       }
-      return;
+      break;
     }
   }
 }
@@ -215,6 +252,16 @@ void ScreamyBall::RunEngine() {
       state_ = GameState::kGameOver;
       last_update_secs_ = 0.00;
     }
+  }
+}
+
+void ScreamyBall::Mute() {
+  if (bg_music_.audio_obj_->getVolume() == 0.00) {
+    bg_music_.audio_obj_->setVolume(kDefaultVolume);
+    scream_audio_.audio_obj_->setVolume(kDefaultVolume);
+  } else {
+    bg_music_.audio_obj_->setVolume(0.00);
+    scream_audio_.audio_obj_->setVolume(0.00);
   }
 }
 
@@ -345,7 +392,7 @@ void ScreamyBall::DrawBackground() {
   int ground_height = engine_.kMinHeight;
   cinder::gl::color(Color::white());
   const ivec2 upper_left = {0, kTileSize * ground_height};
-  const ivec2 bottom_right = {kWidth * kTileSize, kTileSize * kHeight};
+  const ivec2 bottom_right = { kWidth * kTileSize, kTileSize * kHeight };
   cinder::gl::drawSolidRect(cinder::Rectf(upper_left, bottom_right));
 }
 
@@ -354,17 +401,18 @@ void ScreamyBall::DrawBackground() {
  */
 void ScreamyBall::DrawBall() {
   const Location loc = engine_.ball_.location_;
-  const float multiplier_cubed = pow(kLocMultiplier, 3);
+  const float loc_multiplier_cubed = pow(kLocMultiplier, 3);
   const float center_x = (loc.Row() + kLocMultiplier) * kTileSize;
   const float radius_x = (float)kTileSize * kLocMultiplier;
 
   cinder::gl::color(Color(1, 0, 0));
 
   if (engine_.state_ == BallState::kDucking) {
-    const ivec2 ellipse_center = { center_x, (loc.Col() - multiplier_cubed)
-                                          * kTileSize };
+    const ivec2 ellipse_center = { center_x,
+                                   (loc.Col() - loc_multiplier_cubed)
+                                    * kTileSize };
     cinder::gl::drawSolidEllipse(ellipse_center, radius_x,
-        ((float)kTileSize * multiplier_cubed));
+        ((float)kTileSize * loc_multiplier_cubed));
   } else {
     const ivec2 circle_center = { center_x, (loc.Col() - kLocMultiplier)
                                          * kTileSize };
@@ -421,11 +469,11 @@ void ScreamyBall::DrawObstacles() {
 string PrettyPrintElapsedTime(double time_secs) {
   int seconds = (int) time_secs;
 
-  int hours = seconds / (60 * 60);
-  seconds -= hours * (60 * 60);
+  int hours = seconds / (kNumSeconds * kNumSeconds);
+  seconds -= hours * (kNumSeconds * kNumSeconds);
 
-  int minutes = seconds / 60;
-  seconds -= minutes * 60;
+  int minutes = seconds / kNumSeconds;
+  seconds -= minutes * kNumSeconds;
 
   std::stringstream sstream;
   sstream << hours << ':' << minutes << ':' << seconds;
@@ -451,7 +499,7 @@ void ScreamyBall::DrawGameOver() {
 void ScreamyBall::DrawConfirmReset() {
   cinder::gl::clear(Color::black());
   const cinder::vec2 center = getWindowCenter();
-  //Multiplying font size by 4 since there will be 4 lines of text:
+  //Multiplying font size by 3 since there will be 3 lines of text:
   const ivec2 size = {kTileSize * 10, kDefaultFontSize * 3 +
                       kTextBoxBuffer};
   const Color color = Color::white();
@@ -475,9 +523,9 @@ void ScreamyBall::RecognizeCommands(const std::string& message) {
     ParseUserInteraction(KeyEvent::KEY_p);
   } else if (message == "reset game") {
     ParseUserInteraction(KeyEvent::KEY_r);
-  } else if (message == "main menu") {
+  } else if (message == "go to menu") {
     ParseUserInteraction(KeyEvent::KEY_m);
-  } else if (message == "help me") {
+  } else if (message == "instructions") {
     ParseUserInteraction(KeyEvent::KEY_h);
   }
 }
@@ -577,6 +625,7 @@ void ScreamyBall::ParseUserInteraction(int event_code) {
     case KeyEvent::KEY_n: {
       if (state_ == GameState::kConfirmingReset) {
         state_ = last_state_;
+        last_state_ = GameState::kConfirmingReset;
       }
       break;
     }
@@ -597,6 +646,7 @@ bool ScreamyBall::IsInGameInteraction(int event_code) {
       if (paused_) {
         return true;
       }
+      scream_audio_.audio_obj_->start();
       engine_.state_ = BallState::kJumping;
       return true;
     }
@@ -606,6 +656,7 @@ bool ScreamyBall::IsInGameInteraction(int event_code) {
       if (paused_ || engine_.state_ == BallState::kJumping) {
         return true;
       }
+      scream_audio_.audio_obj_->start();
       engine_.state_ = BallState::kDucking;
       return true;
     }

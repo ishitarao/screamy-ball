@@ -6,15 +6,17 @@
 #include <cinder/Timer.h>
 #include <cinder/app/App.h>
 #include <cinder/params/Params.h>
+#include <cinder/audio/Voice.h>
 #include <screamy-ball/engine.h>
-
 #include <sphinx/Recognizer.hpp>
 #include <string>
+#include <utility>
 
 namespace screamyball_app {
 
 using cinder::ColorA;
 using cinder::ivec2;
+using cinder::audio::VoiceRef;
 using std::string;
 
 enum class GameState {
@@ -37,12 +39,21 @@ class ScreamyBall : public cinder::app::App {
   void mouseUp(cinder::app::MouseEvent) override;
 
  private:
+  struct Audio {
+    VoiceRef audio_obj_;
+    const string asset_name_;
+    explicit Audio(string asset_name):
+        asset_name_(std::move(asset_name)) {}
+  };
+
   void SetupRecognizer();
-  void SetupMainMenuUI();
-  void SetupInGameUI();
-  void SetupGeneralUI();
+  void SetupMainMenuUi();
+  void SetupInGameUi();
+  void SetupGeneralUi();
+  void SetupMusic(Audio& audio);
 
   void RunEngine();
+  void Mute();
 
   template <typename C>
   void PrintText(const string& text, float font_size, const C& text_color,
@@ -68,6 +79,7 @@ class ScreamyBall : public cinder::app::App {
   const size_t kDefaultFontSize;
   const size_t kTextBoxBuffer;
   const float kLocMultiplier;
+  const float kDefaultVolume;
   const ivec2 kUiDimensions;
 
   bool paused_;
@@ -84,9 +96,12 @@ class ScreamyBall : public cinder::app::App {
   cinder::params::InterfaceGlRef menu_ui_;
   cinder::params::InterfaceGlRef in_game_ui_;
   cinder::params::InterfaceGlRef general_ui_;
+  Audio bg_music_;
+  Audio scream_audio_;
 
 };
 
+const int kNumSeconds = 60;
 string PrettyPrintElapsedTime(double time_secs);
 
 }  // namespace screamyball_app
