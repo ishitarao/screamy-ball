@@ -16,17 +16,18 @@ can be controlled in 3 ways:
 1. The keyboard
 1. Spoken commands
 
-###Dependencies
+### Dependencies
 * [Cinder](https://github.com/cinder/Cinder)
 * [ciSpeech](https://github.com/Hebali/ciSpeech) (provides Cinder support for 
                                                   [CMU PocketSphinx](http://cmusphinx.sourceforge.net/), a speech 
                                                   recognizer written in C++)
 * [gflags](https://github.com/gflags/gflags)
-* [clang](https://cmake.org/)
+* [cmake](https://cmake.org/)
+* [Catch2](https://github.com/catchorg/Catch2)
                                                                                             
 Due to compatibility issues with ciSpeech, you will require Mac OS for the game to work.
 
-###The Game
+### The Game
 The aim of the game is for the ball to dodge the spikes, either by jumping, or by ducking. This goes on until the ball 
 eventually hits the spikes. Once the game is over, you will be informed of how long you lasted.
 
