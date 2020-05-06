@@ -1,21 +1,14 @@
 Help: Screamy Ball
+
 You are a ball. As we have seen in every generic ball game, balls hate spikes. Your purpose is to dodge the spikes for all eternity.
 That's it. Revolutionary, I know.
-==================================================================
-| Action | Keyboard Controls | Mouse Controls | Speech Controls  |
-------------------------------------------------------------------
-| Jump   |     Up/w/k        |  Left Click    | Say "Higher"     |
-| Duck   |     Down/j/s      |  Right Click   | Say "Lower"      |
-| Pause  |      p            |  Pause Button  | Say "Pause Game" |
-| Reset  |      r            |  Reset Button  | Say "Reset Game" |
-| Menu   |      m            |  Menu Button   | Say "Main Menu"  |
-| Help   |      h            |  Help Button   | Say "Help Me"    |
- ================================================================
-For mouse control, there will be buttons on the screen if you prefer playing that way.
+================================================================= | Action | Keyboard Controls | Mouse Controls | Speech Controls  |
+------------------------------------------------------------------| Jump   |     Up/w/k        |  Left Click    |     "Higher"     |
+| Duck   |     Down/j/s      |  Right Click   |     "Lower"      | | Pause  |      p            |  Pause Button  |   "Pause Game"   |
+| Reset  |      r            |  Reset Button  |   "Reset Game"   | | Menu   |      m            |  Menu Button   |   "Main Menu"    |
+| Help   |      h            |  Help Button   |  "Instructions"  | ================================================================
+NOTE: Speech recognition is slow, so it is not recommended to jump/duck using voice commands.
 
+You can also use the on-screen buttons to control the ball, if you prefer playing that way.
+Note that if you want to duck via the button, you click on it once. To stop ducking, you click on it again.
 
-Note: If you want to duck, click on the duck button. To stop ducking, click on it again. The other buttons are normal.
-
-The game supports spoken commands. Their processing is slow and potentially inaccurate, because that's the state of C++ NLP in 2020.
-Why the commands can't just be "Jump", "Duck", "Pause", and "Reset", you ask? That's because NLP can't handle single-syllable commands.
-'Higher' and 'Lower' are also dissimilar enough not to be mistaken for each other. You WILL serve the Natural Language Processor's whims. All hail the m a c h i n e.
