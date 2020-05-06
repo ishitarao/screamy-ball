@@ -33,3 +33,12 @@ eventually hits the spikes. Once the game is over, you will be informed of how l
 
 To start playing the game, you just click on the start button in the menu. For information on the controls, you can 
 click on the help button. Resetting the game resets the game state.
+
+| Action | Keyboard Controls | Mouse Controls | Speech Controls  |
+|:------:|:-----------------:|:--------------:|:----------------:|
+| Jump   |     Up/w/k        |  Left Click    | Say "Higher"     |
+| Duck   |     Down/j/s      |  Right Click   | Say "Lower"      |
+| Pause  |      p            |  Pause Button  | Say "Pause Game" |
+| Reset  |      r            |  Reset Button  | Say "Reset Game" |
+| Menu   |      m            |  Menu Button   | Say "Main Menu"  |
+| Help   |      h            |  Help Button   | Say "Help Me"    |
