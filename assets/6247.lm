@@ -1,0 +1,63 @@
+Language model created by QuickLM on Wed May  6 18:30:16 EDT 2020
+Copyright (c) 1996-2010 Carnegie Mellon University and Alexander I. Rudnicky
+
+The model is in standard ARPA format, designed by Doug Paul while he was at MITRE.
+
+The code that was used to produce this language model is available in Open Source.
+Please visit http://www.speech.cs.cmu.edu/tools/ for more information
+
+The (fixed) discount mass is 0.5. The backoffs are computed using the ratio method.
+This model based on a corpus of 7 sentences and 12 words
+
+\data\
+ngram 1=12
+ngram 2=17
+ngram 3=11
+
+\1-grams:
+-0.8539 </s> -0.3010
+-0.8539 <s> -0.2355
+-1.3979 GAME -0.2355
+-1.6990 HIGHER -0.2355
+-1.6990 INSTRUCTIONS -0.2355
+-1.6990 LOWER -0.2355
+-1.6990 MAIN -0.2923
+-1.6990 MENU -0.2355
+-1.6990 MUTE -0.2923
+-1.6990 PAUSE -0.2833
+-1.6990 RESET -0.2833
+-1.6990 SOUNDS -0.2355
+
+\2-grams:
+-1.1461 <s> HIGHER 0.0000
+-1.1461 <s> INSTRUCTIONS 0.0000
+-1.1461 <s> LOWER 0.0000
+-1.1461 <s> MAIN 0.0000
+-1.1461 <s> MUTE 0.0000
+-1.1461 <s> PAUSE 0.0000
+-1.1461 <s> RESET 0.0000
+-0.3010 GAME </s> -0.3010
+-0.3010 HIGHER </s> -0.3010
+-0.3010 INSTRUCTIONS </s> -0.3010
+-0.3010 LOWER </s> -0.3010
+-0.3010 MAIN MENU 0.0000
+-0.3010 MENU </s> -0.3010
+-0.3010 MUTE SOUNDS 0.0000
+-0.3010 PAUSE GAME 0.0000
+-0.3010 RESET GAME 0.0000
+-0.3010 SOUNDS </s> -0.3010
+
+\3-grams:
+-0.3010 <s> HIGHER </s>
+-0.3010 <s> INSTRUCTIONS </s>
+-0.3010 <s> LOWER </s>
+-0.3010 <s> MAIN MENU
+-0.3010 <s> MUTE SOUNDS
+-0.3010 <s> PAUSE GAME
+-0.3010 <s> RESET GAME
+-0.3010 MAIN MENU </s>
+-0.3010 MUTE SOUNDS </s>
+-0.3010 PAUSE GAME </s>
+-0.3010 RESET GAME </s>
+
+\end\

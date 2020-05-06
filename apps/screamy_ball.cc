@@ -18,6 +18,7 @@ using cinder::app::MouseEvent;
 using cinder::app::toPixels;
 using cinder::params::InterfaceGl;
 using ci::fs::path;
+using ci::app::getAssetPath;
 using screamy_ball::BallState;
 using screamy_ball::Location;
 
@@ -48,7 +49,7 @@ ScreamyBall::ScreamyBall()
       kDefaultFontSize(30),
       kTextBoxBuffer(10),
       kLocMultiplier(0.5),
-      kDefaultVolume(0.5),
+      kDefaultVolume(0.25), //music might mess with the speech recognition
       kUiDimensions({ FLAGS_tilesize * 4, FLAGS_tilesize * 3}),
       engine_({2, static_cast<int>(FLAGS_height - 2)},
         FLAGS_width, FLAGS_height),
@@ -85,13 +86,12 @@ void ScreamyBall::setup() {
  * Initialises ciSpeech's speech recognizer to 'keyword' mode.
  */
 void ScreamyBall::SetupRecognizer() {
-  ci::fs::path hmm_path  = ci::app::getAssetPath("en-us");
-  ci::fs::path dict_path = ci::app::getAssetPath(
-      "cmudict-en-us.dict");
-  ci::fs::path keyword_path   = ci::app::getAssetPath("key.txt");
+  path acoustic_model_path  = getAssetPath("en-us");
+  path dict_path = getAssetPath("6247.dic");
+  path lang_model_path = getAssetPath("6247.lm");
 
   //set up the language and the dictionary
-  recognizer_ = sphinx::Recognizer::create(hmm_path.string(),
+  recognizer_ = sphinx::Recognizer::create(acoustic_model_path.string(),
       dict_path.string());
 
   //event handler for whenever speech is detected
@@ -99,8 +99,8 @@ void ScreamyBall::SetupRecognizer() {
       &ScreamyBall::RecognizeCommands, this, std::placeholders::_1));
 
   //create and add a model based on the text file
-  recognizer_->addModelJsgf("keyword", keyword_path.string(),
-                            true);
+  recognizer_->addModelJsgf("default", lang_model_path.string(),
+      true);
   recognizer_->start();
 }
 
@@ -514,17 +514,19 @@ void ScreamyBall::DrawConfirmReset() {
  * Recognizes the user's spoken commands to perform the appropriate action.
  */
 void ScreamyBall::RecognizeCommands(const std::string& message) {
-  if (message == "higher") {
+  if (message == "HIGHER") {
     ParseUserInteraction(KeyEvent::KEY_UP);
-  } else if (message == "lower") {
+  } else if (message == "LOWER") {
     ParseUserInteraction(KeyEvent::KEY_DOWN);
-  } else if (message == "pause game") {
+  } else if (message == "PAUSE GAME") { // just 'pause' is recognized randomly
     ParseUserInteraction(KeyEvent::KEY_p);
-  } else if (message == "reset game") {
+  } else if (message == "RESET GAME" || message == "RESET") {
     ParseUserInteraction(KeyEvent::KEY_r);
-  } else if (message == "main menu") {
+  } else if (message == "MUTE SOUNDS" || message == "SOUNDS") {
+    Mute(); //just 'mute' is recognized randomly, but 'sounds' isn't
+  } else if (message == "MAIN MENU" || message == "MENU") {
     ParseUserInteraction(KeyEvent::KEY_m);
-  } else if (message == "game controls") {
+  } else if (message == "INSTRUCTIONS") {
     ParseUserInteraction(KeyEvent::KEY_h);
   }
 }

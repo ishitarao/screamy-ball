@@ -1,6 +1,0 @@
-higher/1e-15/
-lower/1e-15/
-pause game/1e-30/
-reset game/1e-45/
-main menu/1e-40/
-game controls/1e-40/
