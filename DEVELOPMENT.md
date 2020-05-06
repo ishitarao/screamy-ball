@@ -41,8 +41,8 @@
 - **5/4/20**
   - Add README and PROPOSAL files
   - Need to do:
-    - [ ] Improve speech recognition
-    - [ ] Add music
-    - [ ] Add tests
+    - [x] Improve speech recognition
+    - [x] Add music
+    - [x] Add tests
   
 ---

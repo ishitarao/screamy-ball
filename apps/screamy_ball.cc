@@ -49,7 +49,7 @@ ScreamyBall::ScreamyBall()
       kTextBoxBuffer(10),
       kLocMultiplier(0.5),
       kDefaultVolume(0.5),
-      kUiDimensions({ FLAGS_tilesize * 4, FLAGS_tilesize * 5}),
+      kUiDimensions({ FLAGS_tilesize * 4, FLAGS_tilesize * 3}),
       engine_({2, static_cast<int>(FLAGS_height - 2)},
         FLAGS_width, FLAGS_height),
       state_(GameState::kMenu),
@@ -112,29 +112,32 @@ void ScreamyBall::SetupInGameUi() {
   in_game_ui_ = InterfaceGl::create(getWindow(), "Game Options",
                                     toPixels(kUiDimensions));
 
-  // lambda to change the game state to menu when the menu button is pressed
-  in_game_ui_->addButton("Menu",[&]() {
-    last_state_ = state_;
-    state_ = GameState::kMenu; });
-
+  // a lambda is fired to simulate pressing the up key
   in_game_ui_->addButton("Jump", [&]() {
     ParseUserInteraction(KeyEvent::KEY_UP); });
 
+  /* ducking with a button is different from ducking with a keyboard, because
+   * Cinder Params does not have a feature to hold down a button. You have to
+   * click once to duck, and click again to stop ducking. */
   in_game_ui_->addButton("Duck", [&]() {
     if (engine_.state_ == BallState::kDucking) {
       engine_.state_ = BallState::kRolling;
     } else {
-      engine_.state_ = BallState::kDucking;
+      ParseUserInteraction(KeyEvent::KEY_DOWN);
     } });
 
-  in_game_ui_->addButton("Pause",[&]() { paused_ = !paused_; });
+  in_game_ui_->addParam("Pause", &paused_);
+  in_game_ui_->addSeparator();
 
-  in_game_ui_->addButton("Reset",[&]() {
-    last_state_ = state_;
-    state_ = GameState::kConfirmingReset; });
+  // lambda to change the game state to menu when the menu button is pressed
+  in_game_ui_->addButton("Menu",[&]() {
+    ParseUserInteraction(KeyEvent::KEY_m); });
 
   in_game_ui_->addButton("Mute",
-      std::bind(&ScreamyBall::Mute,this));
+                         std::bind(&ScreamyBall::Mute,this));
+
+  in_game_ui_->addButton("Reset",[&]() {
+    ParseUserInteraction(KeyEvent::KEY_r); });
 }
 
 /**
@@ -146,19 +149,18 @@ void ScreamyBall::SetupMainMenuUi() {
 
   //Start button: fires a lambda that starts the timer and the game when pressed
   menu_ui_->addButton("Start",[&]() {
+    ResetGame();
     last_state_ = state_;
     state_ = GameState::kPlaying; });
 
   menu_ui_->addButton("Help",[&]() {
-    last_state_ = state_;
-    state_ = GameState::kHelp; });
-
-  menu_ui_->addButton("Reset",[&]() {
-    last_state_ = state_;
-    state_ = GameState::kConfirmingReset; });
+    ParseUserInteraction(KeyEvent::KEY_h); });
 
   menu_ui_->addButton("Mute",
-      std::bind(&ScreamyBall::Mute,this));
+                      std::bind(&ScreamyBall::Mute,this));
+
+  menu_ui_->addButton("Reset",[&]() {
+    ParseUserInteraction(KeyEvent::KEY_r); });
 }
 
 /**
@@ -170,15 +172,13 @@ void ScreamyBall::SetupGeneralUi() {
 
   // lambda to change the game state to menu when the menu button is pressed
   general_ui_->addButton("Menu",[&]() {
-    last_state_ = state_;
-    state_ = GameState::kMenu; });
-
-  general_ui_->addButton("Reset",[&]() {
-    last_state_ = state_;
-    state_ = GameState::kConfirmingReset; });
+    ParseUserInteraction(KeyEvent::KEY_m); });
 
   general_ui_->addButton("Mute",
-      std::bind(&ScreamyBall::Mute,this));
+                         std::bind(&ScreamyBall::Mute,this));
+
+  general_ui_->addButton("Reset",[&]() {
+    ParseUserInteraction(KeyEvent::KEY_r); });
 }
 
 /**
@@ -350,12 +350,12 @@ void ScreamyBall::PrintText(const string& text, float font_size,
 void ScreamyBall::DrawMainMenu() {
   DrawBackground();
   const ivec2 center = getWindowCenter();
-  const ivec2 size = {kTileSize * 4, kTileSize * 2};
+  const ivec2 size = { kTileSize * 4, kTileSize * 2 };
   const Color color = Color::white();
   PrintText("Screamy Ball", kDefaultFontSize, color, size, center);
 
-  menu_ui_->setPosition({center.x - kTileSize * 2,
-                         center.y + kTileSize});
+  menu_ui_->setPosition({ center.x - kTileSize * 2,
+                         center.y + kTileSize });
   menu_ui_->setSize(size);
 }
 
@@ -365,7 +365,7 @@ void ScreamyBall::DrawMainMenu() {
 void ScreamyBall::DrawHelp() {
   cinder::gl::clear(Color::black());
   const ivec2 pos = {getWindowCenter().x, getWindowPosY()};
-  const ivec2 size = {kWidth * kTileSize, kTileSize};
+  const ivec2 size = { kWidth * kTileSize, kTileSize };
   const Color color = Color::white();
   size_t row = 0;
 
@@ -378,7 +378,7 @@ void ScreamyBall::DrawHelp() {
     // The font is half the tile size
     PrintText(input_stream->readLine(),
         ((float)(kTileSize - kTextBoxBuffer) / 2), color, size,
-        {pos.x, pos.y + (++row) * kTileSize});
+        { pos.x, pos.y + (++row) * kTileSize });
   }
 }
 
@@ -391,7 +391,7 @@ void ScreamyBall::DrawBackground() {
   // draw the ground:
   int ground_height = engine_.kMinHeight;
   cinder::gl::color(Color::white());
-  const ivec2 upper_left = {0, kTileSize * ground_height};
+  const ivec2 upper_left = { 0, kTileSize * ground_height };
   const ivec2 bottom_right = { kWidth * kTileSize, kTileSize * kHeight };
   cinder::gl::drawSolidRect(cinder::Rectf(upper_left, bottom_right));
 }
@@ -418,7 +418,6 @@ void ScreamyBall::DrawBall() {
                                          * kTileSize };
     cinder::gl::drawSolidCircle(circle_center, radius_x);
   }
-
 }
 
 /**
@@ -523,9 +522,9 @@ void ScreamyBall::RecognizeCommands(const std::string& message) {
     ParseUserInteraction(KeyEvent::KEY_p);
   } else if (message == "reset game") {
     ParseUserInteraction(KeyEvent::KEY_r);
-  } else if (message == "go to menu") {
+  } else if (message == "main menu") {
     ParseUserInteraction(KeyEvent::KEY_m);
-  } else if (message == "instructions") {
+  } else if (message == "game controls") {
     ParseUserInteraction(KeyEvent::KEY_h);
   }
 }
