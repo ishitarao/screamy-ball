@@ -41,6 +41,7 @@ DECLARE_uint32(width);
 DECLARE_uint32(height);
 DECLARE_uint32(tilesize);
 DECLARE_double(delay_secs);
+DECLARE_string(player_name);
 
 ScreamyBall::ScreamyBall()
     : kTileSize(FLAGS_tilesize),
@@ -48,9 +49,11 @@ ScreamyBall::ScreamyBall()
       kWidth(FLAGS_width),
       kDefaultFontSize(30),
       kTextBoxBuffer(10),
+      kLeaderboardLimit(3),
       kLocMultiplier(0.5),
-      kDefaultVolume(0.25), //music might mess with the speech recognition
+      kDefaultVolume(0.25), // music might mess with the speech recognition
       kUiDimensions({ FLAGS_tilesize * 4, FLAGS_tilesize * 3}),
+      kPlayerName(FLAGS_player_name),
       engine_({2, static_cast<int>(FLAGS_height - 2)},
         FLAGS_width, FLAGS_height),
       state_(GameState::kMenu),
@@ -262,13 +265,14 @@ void ScreamyBall::RunEngine() {
 
 void ScreamyBall::PopulateLeaderboards() {
   if (top_players_.empty()) {
-    leaderboard_.AddScoreToLeaderBoard({ kPlayerName, elapsed_time_ });
+    Player current_player = { kPlayerName, elapsed_time_ };
+    leaderboard_.AddScoreToLeaderBoard(current_player);
     top_players_ = leaderboard_.RetrieveHighScores(kLeaderboardLimit);
 
-    current_player_top_scores_ = leaderboard_.RetrieveHighScores(Player
-        (kPlayerName, elapsed_time_), kLeaderboardLimit);
+    current_player_top_scores_ = leaderboard_.RetrieveHighScores
+        (current_player, kLeaderboardLimit);
 
-    // It is crucial that these vectors be populated, given that `kLimit` > 0.
+    // It is crucial that these vectors be populated, given that the limit > 0.
     assert(!top_players_.empty());
     assert(!current_player_top_scores_.empty());
   }

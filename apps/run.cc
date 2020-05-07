@@ -19,6 +19,7 @@ DEFINE_uint32(width, 16, "the number of tiles in each row");
 DEFINE_uint32(height, 16, "the number of tiles in each column");
 DEFINE_uint32(tilesize, 50, "the size of each tile");
 DEFINE_double(delay_secs, 0.1, "the delay (in seconds) of the game");
+DEFINE_string(player_name, "J o m p", "The name of the player to display");
 
 const int kSamples = 8;
 const int kWidth = 800;
