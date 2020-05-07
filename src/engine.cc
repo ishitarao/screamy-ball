@@ -110,7 +110,7 @@ bool Engine::HasCollided() {
 void Engine::Reset() {
   state_ = BallState::kRolling;
   reached_max_height_ = false;
-  ball_.location_ = { ball_.location_.Row(), kMinHeight };
-  obstacle_.location_ = { kWindowWidth, kMinHeight };
+  ball_.location = { ball_.location.Row(), kMinHeight };
+  obstacle_.location = { kWindowWidth, kMinHeight };
 }
 }  // namespace screamy-ball

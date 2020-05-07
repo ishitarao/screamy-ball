@@ -3,6 +3,8 @@
 #ifndef FINALPROJECT_INCLUDE_SCREAMY_BALL_PLAYER_H_
 #define FINALPROJECT_INCLUDE_SCREAMY_BALL_PLAYER_H_
 
+#include <string>
+
 namespace screamy_ball {
 
 struct Player {
