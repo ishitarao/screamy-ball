@@ -237,6 +237,7 @@ void ScreamyBall::update() {
       timer_.stop();
       if (confirmed_reset_) {
         ResetGame();
+        leaderboard_.Reset();
       }
       break;
     }
@@ -785,7 +786,6 @@ void ScreamyBall::ResetGame() {
   elapsed_time_ = "00:00:00";
   top_players_.clear();
   current_player_top_scores_.clear();
-  leaderboard_.Reset();
 }
 
 }  // namespace screamyball_app
