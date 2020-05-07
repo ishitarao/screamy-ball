@@ -29,7 +29,8 @@ enum class GameState {
   kHelp,
   kPlaying,
   kGameOver,
-  kConfirmingReset
+  kConfirmingReset,
+  kLeaderboard
 };
 
 class ScreamyBall : public cinder::app::App {

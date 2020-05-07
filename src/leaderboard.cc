@@ -20,8 +20,8 @@ LeaderBoard::LeaderBoard(const string& db_path) : database_(db_path) {
 }
 
 void LeaderBoard::AddScoreToLeaderBoard(const Player& player) {
-  database_ << "INSERT INTO leaderboard (name, score, elapsed_time) "
-               "\nVALUES (?, ?, ?);"
+  database_ << "INSERT INTO leaderboard (name, elapsed_time) "
+               "\nVALUES (?, ?);"
             << player.name << player.elapsed_time;
 }
 
@@ -42,7 +42,7 @@ vector<Player> GetPlayers(sqlite::database_binder* rows) {
 vector<Player> LeaderBoard::RetrieveHighScores(const size_t limit) {
   auto rows = database_ << "SELECT * "
                      "\nFROM leaderboard "
-                     "\nORDER BY \nelapsed_time DESC"
+                     "\nORDER BY \nelapsed_time DESC "
                      "\nLIMIT ?;" << limit;
   return GetPlayers(&rows);
 }
@@ -51,9 +51,13 @@ vector<Player> LeaderBoard::RetrieveHighScores(const Player& player,
                                                const size_t limit) {
   auto rows = database_ << "SELECT * \nFROM leaderboard "
                      "\nWHERE name = ? "
-                     "\nORDER BY \nelapsed_time DESC"
+                     "\nORDER BY \nelapsed_time DESC "
                      "\nLIMIT ?;" << player.name << limit;
   return GetPlayers(&rows);
+}
+
+void LeaderBoard::Reset() {
+  database_ << "DELETE \nFROM leaderboard";
 }
 
 }  // namespace screamy_ball

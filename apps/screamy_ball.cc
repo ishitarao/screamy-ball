@@ -56,6 +56,7 @@ ScreamyBall::ScreamyBall()
       kPlayerName(FLAGS_player_name),
       engine_({2, static_cast<int>(FLAGS_height - 2)},
         FLAGS_width, FLAGS_height),
+      leaderboard_(getAssetPath("screamy_ball.db").string()),
       state_(GameState::kMenu),
       last_state_(GameState::kMenu),
       paused_(false),
@@ -157,6 +158,11 @@ void ScreamyBall::SetupMainMenuUi() {
 
   menu_ui_->addButton("Help",[&]() {
     ParseUserInteraction(KeyEvent::KEY_h); });
+
+  menu_ui_->addButton("Leaderboard", [&]() {
+    last_state_ = state_;
+    state_ = GameState::kLeaderboard;
+  });
 
   menu_ui_->addButton("Mute",
                       std::bind(&ScreamyBall::Mute,this));
@@ -322,6 +328,10 @@ void ScreamyBall::draw() {
       DrawConfirmReset();
       break;
     }
+    case GameState::kLeaderboard: {
+      DrawLeaderboard();
+      break;
+    }
 
     case GameState::kPlaying: {
       in_game_ui_->show();
@@ -382,7 +392,6 @@ void ScreamyBall::DrawMainMenu() {
 
   menu_ui_->setPosition({ center.x - kTileSize * 2,
                          center.y + kTileSize });
-  menu_ui_->setSize(size);
 }
 
 /**
@@ -522,7 +531,6 @@ void ScreamyBall::DrawGameOver() {
  * leaderboard containing the current player's top scores.
  */
 void ScreamyBall::DrawLeaderboard() {
-  if (top_players_.empty()) return;
 
   cinder::gl::clear(Color::black());
 
@@ -530,6 +538,13 @@ void ScreamyBall::DrawLeaderboard() {
                                    kTileSize * 2 };
   const cinder::ivec2 size = { kTileSize * 10, kTileSize };
   const Color color = Color::white();
+
+  if (top_players_.empty()) {
+    PrintText("Sorry, no leaderboard data is available yet. :(",
+        kDefaultFontSize, color, { kTileSize * 10, kTileSize * 2 },
+        getWindowCenter());
+    return;
+  }
 
   size_t row = 0;
 
@@ -564,15 +579,27 @@ void ScreamyBall::DrawLeaderboard() {
  */
 void ScreamyBall::DrawConfirmReset() {
   cinder::gl::clear(Color::black());
-  const cinder::vec2 center = getWindowCenter();
+  const cinder::vec2 start_text = { getWindowCenter().x, getWindowPosY() +
+      kTileSize * 2 };
   //Multiplying font size by 3 since there will be 3 lines of text:
   const ivec2 size = {kTileSize * 10, kDefaultFontSize * 3 +
                       kTextBoxBuffer};
   const Color color = Color::white();
 
-  PrintText("Do you really want to reset the game? "
-            "Press y for yes, and n for no.", kDefaultFontSize, color, size,
-            center);
+  PrintText("Do you really want to reset the game?", kDefaultFontSize,
+      color, size, start_text);
+
+  size_t row = 1;
+
+  PrintText("You will lose your progress and leaderboard data.",
+      kDefaultFontSize, color, size,
+      { start_text.x, start_text.y + kTileSize * (++row) });
+
+  row++;
+
+  PrintText("Press y for yes, and n for no.", kDefaultFontSize,
+            color, size,
+            { start_text.x, start_text.y + kTileSize * (++row) });
 }
 
 /* --------------------------User Interaction-------------------------------- */
@@ -755,6 +782,10 @@ void ScreamyBall::ResetGame() {
   state_ = GameState::kMenu;
   timer_.stop();
   last_update_secs_ = 0.00;
+  elapsed_time_ = "00:00:00";
+  top_players_.clear();
+  current_player_top_scores_.clear();
+  leaderboard_.Reset();
 }
 
 }  // namespace screamyball_app
