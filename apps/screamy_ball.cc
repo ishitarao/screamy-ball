@@ -402,7 +402,7 @@ void ScreamyBall::DrawBackground() {
  * Draws the ball in two states: normally, and while ducking.
  */
 void ScreamyBall::DrawBall() {
-  const Location loc = engine_.ball_.location_;
+  const Location loc = engine_.ball_.location;
   const float loc_multiplier_cubed = pow(kLocMultiplier, 3);
   const float center_x = (loc.Row() + kLocMultiplier) * kTileSize;
   const float radius_x = (float)kTileSize * kLocMultiplier;
@@ -429,14 +429,14 @@ void ScreamyBall::DrawBall() {
  */
 void ScreamyBall::DrawObstacles() {
   screamy_ball::Obstacle obstacle = engine_.obstacle_;
-  Location loc = obstacle.location_;
+  Location loc = obstacle.location;
   const int obstacle_height = obstacle.kHeight;
   const float loc_incre = kTileSize * kLocMultiplier;
 
   cinder::gl::color(Color::gray(0.5)); // 0.5 is the % of grey
 
   //create spikes
-  for (int counter = 0; counter < obstacle.length_; counter++) {
+  for (int counter = 0; counter < obstacle.length; counter++) {
 
     // points of a triangle for a 'low' obstacle
     ivec2 point_1 = {loc.Row() * kTileSize, loc.Col() * kTileSize};
@@ -447,7 +447,7 @@ void ScreamyBall::DrawObstacles() {
                               (loc.Col() - obstacle_height) * kTileSize};
 
     // increment location if it's a 'high' obstacle
-    if (obstacle.type_ == screamy_ball::ObstacleType::kHigh) {
+    if (obstacle.type == screamy_ball::ObstacleType::kHigh) {
       point_1.y += loc_incre;
       point_2.y += loc_incre;
       point_3.y = (float) (loc.Col() + obstacle_height) * kTileSize + loc_incre;
