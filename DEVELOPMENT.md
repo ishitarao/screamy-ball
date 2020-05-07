@@ -45,5 +45,6 @@
   - Added tests
 - **5/6/20**
   - Improved the speech recognizer's accuracy and speed
+  - Added a leaderboard using SQLite
   
 ---

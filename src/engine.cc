@@ -14,6 +14,10 @@ Engine::Engine(const Location& ball_loc, int width, int height) :
     reached_max_height_(false),
     obstacle_(ObstacleType::kLow, { width, kMinHeight }) {}
 
+/**
+ * The main function of Engine, to be called by the app. It checks for
+ * collision, it creates obstacles, and it jumps when necessary.
+ */
 void Engine::Run() {
   if (HasCollided()) {
     state_ = BallState::kCollided;
@@ -25,6 +29,9 @@ void Engine::Run() {
   }
 }
 
+/**
+ * Changes the ball's location to make it seem like it's jumping.
+ */
 void Engine::Jump() {
   if (reached_max_height_) {
     ball_.location = {ball_.location.Row(),
@@ -42,15 +49,17 @@ void Engine::Jump() {
   }
 }
 
-
-Obstacle Engine::CreateObstacle() {
+/**
+ * Creates an obstacle and changes its location on every update.
+ */
+void Engine::CreateObstacle() {
   // make obstacle move towards the ball
   obstacle_.location = {obstacle_.location.Row() - 1,
                          obstacle_.location.Col()};
 
   // if the obstacle hasn't reached the end of the screen, return
   if (obstacle_.location.Row() != -(obstacle_.length)) {
-    return obstacle_;
+    return;
   }
 
   // create a random seed to generate a random type and a random length
@@ -60,11 +69,14 @@ Obstacle Engine::CreateObstacle() {
   obstacle_.type = GetObstacleType(rng);
   obstacle_.length = GetObstacleLength(rng);
   obstacle_.location = GetObstacleLocation();
-
-  return obstacle_;
 }
 
-ObstacleType GetObstacleType(mt19937 rng) {
+/**
+ * Randomly generates an obstacle type.
+ * @param rng the random seed.
+ * @return the generated ObstacleType enum.
+ */
+ObstacleType Engine::GetObstacleType(mt19937 rng) {
   std::uniform_int_distribution<mt19937::result_type> rand_bool(0,1);
 
   if (rand_bool(rng)) {
@@ -73,6 +85,10 @@ ObstacleType GetObstacleType(mt19937 rng) {
   return ObstacleType::kLow;
 }
 
+/**
+ * Calculates the obstacle's next location.
+ * @return the obstacle location.
+ */
 Location Engine::GetObstacleLocation() {
   if (obstacle_.type == ObstacleType::kHigh) {
     return { kWindowWidth, kMinHeight - obstacle_.kHeight - 1 };
@@ -81,12 +97,21 @@ Location Engine::GetObstacleLocation() {
   }
 }
 
+/**
+ * Randomly generates the obstacle's length.
+ * @param rng the random seed.
+ * @return the generated length.
+ */
 int Engine::GetObstacleLength(mt19937 rng) {
   std::uniform_int_distribution<mt19937::result_type> rand_length(
       obstacle_.kMinLength, obstacle_.kMaxLength);
   return rand_length(rng);
 }
 
+/**
+ * Checks if the ball has collided with an obstacle or not.
+ * @return true if a collision has occurred, false otherwise.
+ */
 bool Engine::HasCollided() {
   int obstacle_x = obstacle_.location.Row();
   int ball_x = ball_.location.Row();
@@ -107,6 +132,9 @@ bool Engine::HasCollided() {
   }
 }
 
+/**
+ * Resets the Engine's state and all locations.
+ */
 void Engine::Reset() {
   state_ = BallState::kRolling;
   reached_max_height_ = false;

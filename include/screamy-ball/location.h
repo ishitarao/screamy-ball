@@ -1,4 +1,4 @@
-// Copyright (c) 2020 CS126SP20. All rights reserved.
+// Copyright (c) 2020 Ishita Rao. All rights reserved.
 
 #ifndef FINALPROJECT_INCLUDE_SCREAMY_BALL_LOCATION_H_
 #define FINALPROJECT_INCLUDE_SCREAMY_BALL_LOCATION_H_
@@ -8,7 +8,9 @@
 
 namespace screamy_ball {
 
-// Represents a location on the board.
+/**
+ * Represents a location on the board.
+ */
 class Location {
  public:
   Location();

@@ -12,14 +12,22 @@ namespace screamy_ball {
 using std::string;
 using std::vector;
 
-LeaderBoard::LeaderBoard(const string& db_path) : database_(db_path) {
+/**
+ * Creates a new leaderboard table if it doesn't already exist.
+ * @param db_path the path to the database.
+ */
+Leaderboard::Leaderboard(const string& db_path) : database_(db_path) {
   database_ << "CREATE TABLE if not exists leaderboard (\n"
          "  name  TEXT NOT NULL,\n"
          " elapsed_time TEXT NOT NULL\n"
          ");";
 }
 
-void LeaderBoard::AddScoreToLeaderBoard(const Player& player) {
+/**
+ * Adds a player to the leaderboard.
+ * @param player the player whose name and time is being added.
+ */
+void Leaderboard::AddScoreToLeaderboard(const Player& player) {
   database_ << "INSERT INTO leaderboard (name, elapsed_time) "
                "\nVALUES (?, ?);"
             << player.name << player.elapsed_time;
@@ -39,7 +47,13 @@ vector<Player> GetPlayers(sqlite::database_binder* rows) {
   return players;
 }
 
-vector<Player> LeaderBoard::RetrieveHighScores(const size_t limit) {
+/**
+ * Returns a list of the players with the highest scores, in decreasing order.
+ * The size of the list should be no greater than `limit`.
+ * @param limit The number of records we're limiting the list to.
+ * @return a vector containing the list of players with the highest scores.
+ */
+vector<Player> Leaderboard::RetrieveHighScores(const size_t limit) {
   auto rows = database_ << "SELECT * "
                      "\nFROM leaderboard "
                      "\nORDER BY \nelapsed_time DESC "
@@ -47,7 +61,15 @@ vector<Player> LeaderBoard::RetrieveHighScores(const size_t limit) {
   return GetPlayers(&rows);
 }
 
-vector<Player> LeaderBoard::RetrieveHighScores(const Player& player,
+/**
+ * Returns a list of the players with the longest times,
+ * that have the same `name` as the input player name.
+ * The size of the list should be no greater than `limit`.
+ * @param player the player whose times we're retrieving.
+ * @param limit The number of records we're limiting the list to.
+ * @return a vector containing the list of times of the given player.
+ */
+vector<Player> Leaderboard::RetrieveHighScores(const Player& player,
                                                const size_t limit) {
   auto rows = database_ << "SELECT * \nFROM leaderboard "
                      "\nWHERE name = ? "
@@ -56,7 +78,10 @@ vector<Player> LeaderBoard::RetrieveHighScores(const Player& player,
   return GetPlayers(&rows);
 }
 
-void LeaderBoard::Reset() {
+/**
+ * Deletes all records in the leaderboard.
+ */
+void Leaderboard::Reset() {
   database_ << "DELETE \nFROM leaderboard";
 }
 

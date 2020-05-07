@@ -8,6 +8,9 @@
 #include "location.h"
 
 namespace screamy_ball {
+/**
+ * Represents the state of the ball. The default state is 'rolling'.
+ */
 enum class BallState {
   kRolling,
   kDucking,
@@ -15,6 +18,9 @@ enum class BallState {
   kCollided
 };
 
+/**
+ * Represents the ball, which is controlled by the user.
+ */
 struct Ball {
   Ball(const Location& location) : location(location) {}
   Location location;

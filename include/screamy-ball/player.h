@@ -7,6 +7,10 @@
 
 namespace screamy_ball {
 
+/**
+ * A Player object contains the player's name and their elapsed_time during
+ * the current game. This struct is for leaderboard purposes.
+ */
 struct Player {
   Player(const std::string& name, const std::string& elapsed_time) :
     name(name),

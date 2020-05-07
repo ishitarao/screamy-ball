@@ -289,7 +289,7 @@ void ScreamyBall::RunEngine() {
 void ScreamyBall::PopulateLeaderboards() {
   if (top_players_.empty()) {
     Player current_player = { kPlayerName, elapsed_time_ };
-    leaderboard_.AddScoreToLeaderBoard(current_player);
+    leaderboard_.AddScoreToLeaderboard(current_player);
     top_players_ = leaderboard_.RetrieveHighScores(kLeaderboardLimit);
 
     current_player_top_scores_ = leaderboard_.RetrieveHighScores

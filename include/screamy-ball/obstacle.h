@@ -7,14 +7,21 @@
 
 namespace screamy_ball {
 
+/**
+ * Represents the obstacle type. 'high' obstacles must be ducked from, while
+ * 'low' obstacles must be jumped over.
+ */
 enum class ObstacleType { kHigh, kLow };
 
+/**
+ * Represents an obstacle, or a spike, that the ball must avoid.
+ */
 struct Obstacle {
   const int kHeight;
   const int kMinLength;
   const int kMaxLength;
   ObstacleType type;
-  int length;
+  size_t length;
   Location location;
 
   Obstacle(ObstacleType type, const Location& location):

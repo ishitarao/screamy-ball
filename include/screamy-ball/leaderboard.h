@@ -13,21 +13,15 @@
 
 namespace screamy_ball {
 
-class LeaderBoard {
+/**
+ * Represents the overall leaderboard.
+ */
+class Leaderboard {
  public:
-  // Creates a new leaderboard table if it doesn't already exist.
-  explicit LeaderBoard(const std::string& db_path);
+  explicit Leaderboard(const std::string& db_path);
+  void AddScoreToLeaderboard(const Player& player);
 
-  // Adds a player to the leaderboard.
-  void AddScoreToLeaderBoard(const Player&);
-
-  // Returns a list of the players with the highest scores, in decreasing order.
-  // The size of the list should be no greater than `limit`.
   std::vector<Player> RetrieveHighScores(const size_t limit);
-
-  // Returns a list of the players with the longest times,
-  // that have the same `name` as the input player name.
-  // The size of the list should be no greater than `limit`.
   std::vector<Player> RetrieveHighScores(const Player&, const size_t limit);
 
   void Reset();

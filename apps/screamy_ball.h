@@ -24,6 +24,10 @@ using cinder::audio::VoiceRef;
 using screamy_ball::Player;
 using std::string;
 
+/**
+ * Represents the current game state, and determines what should be displayed
+ * to the user.
+ */
 enum class GameState {
   kMenu,
   kHelp,
@@ -33,6 +37,9 @@ enum class GameState {
   kLeaderboard
 };
 
+/**
+ * The main class responsible for the graphics and parsing user interactions.
+ */
 class ScreamyBall : public cinder::app::App {
  public:
   ScreamyBall();
@@ -106,7 +113,7 @@ class ScreamyBall : public cinder::app::App {
   GameState last_state_;
 
   screamy_ball::Engine engine_;
-  screamy_ball::LeaderBoard leaderboard_;
+  screamy_ball::Leaderboard leaderboard_;
   std::vector<Player> top_players_;
   std::vector<Player> current_player_top_scores_;
 

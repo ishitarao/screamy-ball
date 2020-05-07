@@ -25,6 +25,10 @@ const int kSamples = 8;
 const int kWidth = 800;
 const int kHeight = 800;
 
+/**
+ * Parses the command-line arguments using gflags.
+ * @param args the arguments to parse.
+ */
 void ParseArgs(vector<string>* args) {
   gflags::SetUsageMessage(
       "Play a game called Screamy Ball. Pass --helpshort for options.");
@@ -39,6 +43,10 @@ void ParseArgs(vector<string>* args) {
   gflags::ParseCommandLineFlags(&argc, &argv, true);
 }
 
+/**
+ * Sets up the Cinder application.
+ * @param settings the Cinder app's settings that we need to set up.
+ */
 void SetUp(App::Settings* settings) {
   vector<string> args = settings->getCommandLineArgs();
   ParseArgs(&args);
