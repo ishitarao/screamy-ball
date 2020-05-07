@@ -10,8 +10,8 @@ layout.
 
 ---
 
-Screamy Ball is a retro recreation of Google Chrome’s [T. Rex Game](https://chromedino.com/), except the obstacles are spiked and the T. Rex is a ball that 
-can be controlled in 3 ways:
+Screamy Ball is a retro recreation of Google Chrome’s [T. Rex Game](https://chromedino.com/), except the obstacles are 
+spikes and the T. Rex is a ball that can be controlled in 3 ways:
 1. The mouse
 1. The keyboard
 1. Spoken commands

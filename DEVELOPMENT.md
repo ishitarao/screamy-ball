@@ -39,10 +39,11 @@
 - **5/1/20**
   - Added a help page
 - **5/4/20**
-  - Add README and PROPOSAL files
-  - Need to do:
-    - [x] Improve speech recognition
-    - [x] Add music
-    - [x] Add tests
+  - Added README and PROPOSAL files
+- **5/5/20**
+  - Added audio to the game
+  - Added tests
+- **5/6/20**
+  - Improved the speech recognizer's accuracy and speed
   
 ---
