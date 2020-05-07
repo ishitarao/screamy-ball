@@ -44,3 +44,5 @@ click on the help button. Resetting the game resets the game state.
 | Reset  |      r            |  Reset Button  | Say "Reset Game" |
 | Menu   |      m            |  Menu Button   | Say "Main Menu"  |
 | Help   |      h            |  Help Button   |Say "Instructions"|
+
+Speech recognition can be unpredictable in terms of delay, so you may use it at your own discretion.

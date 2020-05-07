@@ -117,8 +117,7 @@ void ScreamyBall::SetupInGameUi() {
     ParseUserInteraction(KeyEvent::KEY_UP); });
 
   /* ducking with a button is different from ducking with a keyboard, because
-   * Cinder Params does not have a feature to hold down a button. You have to
-   * click once to duck, and click again to stop ducking. */
+   * Cinder Params does not have a feature to hold down a button. */
   in_game_ui_->addButton("Duck", [&]() {
     if (engine_.state_ == BallState::kDucking) {
       engine_.state_ = BallState::kRolling;
@@ -210,7 +209,6 @@ void ScreamyBall::update() {
       if (paused_) {
         return;
       }
-
       if (timer_.isStopped()) {
         if (last_state_ == GameState::kMenu) {
           timer_.start();
@@ -243,10 +241,11 @@ void ScreamyBall::update() {
  */
 void ScreamyBall::RunEngine() {
   const double current_time = timer_.getSeconds();
+  // manage game speed
   if (current_time - last_update_secs_ >= delay_secs_) {
     engine_.Run();
     last_update_secs_ = current_time;
-    //change the game state to Game Over if a collision is detected
+
     if (engine_.state_ == BallState::kCollided) {
       last_state_ = state_;
       state_ = GameState::kGameOver;
@@ -255,6 +254,9 @@ void ScreamyBall::RunEngine() {
   }
 }
 
+/**
+ * Mutes audio if unmuted, unmutes audio otherwise.
+ */
 void ScreamyBall::Mute() {
   if (bg_music_.audio_obj_->getVolume() == 0.00) {
     bg_music_.audio_obj_->setVolume(kDefaultVolume);

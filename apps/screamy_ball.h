@@ -66,7 +66,7 @@ class ScreamyBall : public cinder::app::App {
   void DrawGameOver();
   void DrawConfirmReset();
 
-  void RecognizeCommands(const std::string& msg);
+  void RecognizeCommands(const std::string& message);
   void ParseUserInteraction(int event_code);
   bool IsInGameInteraction(int event_code);
 
@@ -92,12 +92,12 @@ class ScreamyBall : public cinder::app::App {
   GameState last_state_;
 
   cinder::Timer timer_;
-  sphinx::RecognizerRef recognizer_;
   cinder::params::InterfaceGlRef menu_ui_;
   cinder::params::InterfaceGlRef in_game_ui_;
   cinder::params::InterfaceGlRef general_ui_;
   Audio bg_music_;
   Audio scream_audio_;
+  sphinx::RecognizerRef recognizer_;
 
 };
 
