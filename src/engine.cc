@@ -54,11 +54,11 @@ void Engine::Jump() {
  */
 void Engine::CreateObstacle() {
   // make obstacle move towards the ball
-  obstacle_.location = {obstacle_.location.Row() - 1,
-                         obstacle_.location.Col()};
+  obstacle_.location = { obstacle_.location.Row() - 1,
+                         obstacle_.location.Col() };
 
   // if the obstacle hasn't reached the end of the screen, return
-  if (obstacle_.location.Row() != -(obstacle_.length)) {
+  if (obstacle_.location.Row() != -(obstacle_.length) - 1) {
     return;
   }
 
@@ -117,7 +117,7 @@ bool Engine::HasCollided() {
   int ball_x = ball_.location.Row();
 
   // return false if the obstacle isn't within the range of the ball
-  if (obstacle_x - 1 > ball_x || obstacle_x - 1 < ball_x - obstacle_.length) {
+  if (obstacle_x - 1 > ball_x || obstacle_x - 1 <= ball_x - obstacle_.length) {
     return false;
   }
 

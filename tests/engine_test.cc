@@ -51,7 +51,7 @@ TEST_CASE("Obstacle Creation test", "[obstacle]") {
   REQUIRE(engine.obstacle_.location == obstacle_loc);
 
   SECTION("Test for when the obstacle has reached the end of the screen") {
-    engine.obstacle_.location = { -(engine.obstacle_.length - 1), loc.Col() };
+    engine.obstacle_.location = { -(engine.obstacle_.length), loc.Col() };
     engine.Run();
     Location new_loc = { kWidth, engine.obstacle_.location.Col() };
     REQUIRE(engine.obstacle_.location == new_loc);

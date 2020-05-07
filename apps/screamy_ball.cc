@@ -244,6 +244,7 @@ void ScreamyBall::update() {
       timer_.stop();
       elapsed_time_ = PrettyPrintElapsedTime(timer_.getSeconds());
       PopulateLeaderboards();
+      break;
     }
 
     case GameState::kConfirmingReset: {

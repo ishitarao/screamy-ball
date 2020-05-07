@@ -21,7 +21,7 @@ struct Obstacle {
   const int kMinLength;
   const int kMaxLength;
   ObstacleType type;
-  size_t length;
+  int length;
   Location location;
 
   Obstacle(ObstacleType type, const Location& location):
