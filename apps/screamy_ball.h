@@ -70,6 +70,7 @@ class ScreamyBall : public cinder::app::App {
   void DrawBall();
   void DrawObstacles();
   void DrawGameOver();
+  void DrawLeaderboard();
   void DrawConfirmReset();
 
   void RecognizeCommands(const std::string& message);

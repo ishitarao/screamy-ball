@@ -518,6 +518,48 @@ void ScreamyBall::DrawGameOver() {
 }
 
 /**
+ * Draws the leaderboard containing the top player scores, and the
+ * leaderboard containing the current player's top scores.
+ */
+void ScreamyBall::DrawLeaderboard() {
+  if (top_players_.empty()) return;
+
+  cinder::gl::clear(Color::black());
+
+  const cinder::vec2 start_text = { getWindowCenter().x, getWindowPosY() +
+                                   kTileSize * 2 };
+  const cinder::ivec2 size = { kTileSize * 10, kTileSize };
+  const Color color = Color::white();
+
+  size_t row = 0;
+
+  // print top players
+  PrintText("Name - Time", kDefaultFontSize, color, size,
+            { start_text.x, start_text.y + (++row) * kTileSize });
+
+  for (const Player& player : top_players_) {
+    std::stringstream ss;
+    ss << player.name << " - " << player.elapsed_time;
+    PrintText(ss.str(), kDefaultFontSize, color, size,
+        { start_text.x,start_text.y + (++row) * kTileSize });
+  }
+
+  row++; // leave a blank line
+
+  // print current player's top scores
+  PrintText(kPlayerName + "'s Best Times: ", kDefaultFontSize, color, size,
+            { start_text.x, start_text.y + (++row) * kTileSize });
+
+  PrintText("Score - Time", kDefaultFontSize, color, size,
+            { start_text.x, start_text.y + (++row) * kTileSize });
+
+  for (const Player& player : current_player_top_scores_) {
+    PrintText(elapsed_time_, kDefaultFontSize, color, size,
+        { start_text.x,start_text.y + (++row) * kTileSize} );
+  }
+}
+
+/**
  * Draws the page that asks the user to confirm if they want to reset or not.
  */
 void ScreamyBall::DrawConfirmReset() {
