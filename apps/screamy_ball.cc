@@ -270,6 +270,9 @@ void ScreamyBall::RunEngine() {
   }
 }
 
+/**
+ * Updates the leaderborads with the latest times.
+ */
 void ScreamyBall::PopulateLeaderboards() {
   if (top_players_.empty()) {
     Player current_player = { kPlayerName, elapsed_time_ };
@@ -296,6 +299,43 @@ void ScreamyBall::Mute() {
     bg_music_.audio_obj_->setVolume(0.00);
     scream_audio_.audio_obj_->setVolume(0.00);
   }
+}
+
+/**
+ * Pretty Prints the input time in seconds in the format hh:mm:ss.
+ * @param time_secs the time in seconds to pretty print
+ * @return the elapsed time in the above format
+ */
+string PrettyPrintElapsedTime(double time_secs) {
+  int seconds = (int) time_secs;
+  int double_digits = 10;
+
+  int hours = seconds / (kNumSeconds * kNumSeconds);
+  seconds -= hours * (kNumSeconds * kNumSeconds);
+
+  int minutes = seconds / kNumSeconds;
+  seconds -= minutes * kNumSeconds;
+
+  std::stringstream sstream;
+  if (hours < double_digits) {
+    sstream << '0' << hours << ':';
+  } else {
+    sstream << hours << ':';
+  }
+
+  if (minutes < double_digits) {
+    sstream << '0' << minutes << ':';
+  } else {
+    sstream << minutes << ':';
+  }
+
+  if (seconds < double_digits) {
+    sstream << '0' << seconds;
+  } else {
+    sstream << seconds;
+  }
+
+  return sstream.str();
 }
 
 /* ----------------------------------Draw------------------------------------ */
@@ -494,25 +534,6 @@ void ScreamyBall::DrawObstacles() {
     // update location to draw another spike
     loc = { loc.Row() + 1, loc.Col() };
   }
-}
-
-/**
- * Pretty Prints the input time in seconds in the format hh:mm:ss.
- * @param time_secs the time in seconds to pretty print
- * @return the elapsed time in the above format
- */
-string PrettyPrintElapsedTime(double time_secs) {
-  int seconds = (int) time_secs;
-
-  int hours = seconds / (kNumSeconds * kNumSeconds);
-  seconds -= hours * (kNumSeconds * kNumSeconds);
-
-  int minutes = seconds / kNumSeconds;
-  seconds -= minutes * kNumSeconds;
-
-  std::stringstream sstream;
-  sstream << hours << ':' << minutes << ':' << seconds;
-  return sstream.str();
 }
 
 /**
