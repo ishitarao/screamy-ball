@@ -56,6 +56,7 @@ class ScreamyBall : public cinder::app::App {
   void SetupMainMenuUi();
   void SetupInGameUi();
   void SetupGeneralUi();
+  void SetupInitialLeaderboards();
   void SetupMusic(Audio& audio);
 
   void PopulateLeaderboards();

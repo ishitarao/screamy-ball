@@ -57,6 +57,7 @@ ScreamyBall::ScreamyBall()
       engine_({2, static_cast<int>(FLAGS_height - 2)},
         FLAGS_width, FLAGS_height),
       leaderboard_(getAssetPath("screamy_ball.db").string()),
+      elapsed_time_("00:00:00"),
       state_(GameState::kMenu),
       last_state_(GameState::kMenu),
       paused_(false),
@@ -80,6 +81,8 @@ void ScreamyBall::setup() {
   SetupMainMenuUi();
   SetupInGameUi();
   SetupGeneralUi();
+
+  SetupInitialLeaderboards();
 
   SetupMusic(bg_music_);
   SetupMusic(scream_audio_);
@@ -187,6 +190,16 @@ void ScreamyBall::SetupGeneralUi() {
 
   general_ui_->addButton("Reset",[&]() {
     ParseUserInteraction(KeyEvent::KEY_r); });
+}
+
+/**
+ * Sets up the leaderboard at the start of the game.
+ */
+void ScreamyBall::SetupInitialLeaderboards() {
+  top_players_ = leaderboard_.RetrieveHighScores(kLeaderboardLimit);
+
+  current_player_top_scores_ = leaderboard_.RetrieveHighScores
+      ({ kPlayerName, elapsed_time_ }, kLeaderboardLimit);
 }
 
 /**
