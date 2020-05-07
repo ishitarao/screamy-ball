@@ -5,9 +5,12 @@
 
 #include <cinder/Timer.h>
 #include <cinder/app/App.h>
-#include <cinder/params/Params.h>
 #include <cinder/audio/Voice.h>
+#include <cinder/params/Params.h>
 #include <screamy-ball/engine.h>
+#include <screamy-ball/leaderboard.h>
+#include <screamy-ball/player.h>
+
 #include <sphinx/Recognizer.hpp>
 #include <string>
 #include <utility>
@@ -17,6 +20,8 @@ namespace screamyball_app {
 using cinder::ColorA;
 using cinder::ivec2;
 using cinder::audio::VoiceRef;
+
+using screamy_ball::Player;
 using std::string;
 
 enum class GameState {
@@ -52,6 +57,7 @@ class ScreamyBall : public cinder::app::App {
   void SetupGeneralUi();
   void SetupMusic(Audio& audio);
 
+  void PopulateLeaderboards();
   void RunEngine();
   void Mute();
 
@@ -78,18 +84,24 @@ class ScreamyBall : public cinder::app::App {
   const size_t kWidth;
   const size_t kDefaultFontSize;
   const size_t kTextBoxBuffer;
+  const size_t kLeaderboardLimit;
   const float kLocMultiplier;
   const float kDefaultVolume;
   const ivec2 kUiDimensions;
+  const string kPlayerName;
 
   bool paused_;
   bool confirmed_reset_;
   double delay_secs_;
   double last_update_secs_;
-
-  screamy_ball::Engine engine_;
+  string elapsed_time_;
   GameState state_;
   GameState last_state_;
+
+  screamy_ball::Engine engine_;
+  screamy_ball::LeaderBoard leaderboard_;
+  std::vector<Player> top_players_;
+  std::vector<Player> current_player_top_scores_;
 
   cinder::Timer timer_;
   cinder::params::InterfaceGlRef menu_ui_;

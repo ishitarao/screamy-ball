@@ -218,6 +218,12 @@ void ScreamyBall::update() {
       break;
     }
 
+    case GameState::kGameOver: {
+      timer_.stop();
+      elapsed_time_ = PrettyPrintElapsedTime(timer_.getSeconds());
+      PopulateLeaderboards();
+    }
+
     case GameState::kConfirmingReset: {
       timer_.stop();
       if (confirmed_reset_) {
@@ -251,6 +257,20 @@ void ScreamyBall::RunEngine() {
       state_ = GameState::kGameOver;
       last_update_secs_ = 0.00;
     }
+  }
+}
+
+void ScreamyBall::PopulateLeaderboards() {
+  if (top_players_.empty()) {
+    leaderboard_.AddScoreToLeaderBoard({ kPlayerName, elapsed_time_ });
+    top_players_ = leaderboard_.RetrieveHighScores(kLeaderboardLimit);
+
+    current_player_top_scores_ = leaderboard_.RetrieveHighScores(Player
+        (kPlayerName, elapsed_time_), kLeaderboardLimit);
+
+    // It is crucial that these vectors be populated, given that `kLimit` > 0.
+    assert(!top_players_.empty());
+    assert(!current_player_top_scores_.empty());
   }
 }
 
@@ -489,8 +509,7 @@ void ScreamyBall::DrawGameOver() {
   const cinder::vec2 center = getWindowCenter();
   const ivec2 size = {kTileSize * 10, kTileSize};
   const Color color = Color::white();
-  string elapsed_time = PrettyPrintElapsedTime(timer_.getSeconds());
-  PrintText("Your time: " + elapsed_time, kDefaultFontSize, color, size,
+  PrintText("Your time: " + elapsed_time_, kDefaultFontSize, color, size,
       center);
 }
 
