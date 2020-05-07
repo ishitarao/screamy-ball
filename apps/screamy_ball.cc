@@ -582,30 +582,50 @@ void ScreamyBall::DrawLeaderboard() {
   }
 
   size_t row = 0;
+  DrawTopPlayerScores(row, color, size, start_text);
+  row++;
+  DrawCurrentPlayerScores(row, color, size, start_text);
+}
 
+/**
+ * Draws the scores of the top players.
+ * @param start_row the row from which to start printing text.
+ * @param color the color of the text.
+ * @param size the size of the text box.
+ * @param pos the location of the text.
+ */
+void ScreamyBall::DrawTopPlayerScores(size_t& start_row, const Color& color,
+    const ivec2& size, const ivec2& pos) {
   // print top players
   PrintText("Name - Time", kDefaultFontSize, color, size,
-            { start_text.x, start_text.y + (++row) * kTileSize });
+            { pos.x, pos.y + (++start_row) * kTileSize });
 
   for (const Player& player : top_players_) {
     std::stringstream ss;
     ss << player.name << " - " << player.elapsed_time;
     PrintText(ss.str(), kDefaultFontSize, color, size,
-        { start_text.x,start_text.y + (++row) * kTileSize });
+              { pos.x, pos.y + (++start_row) * kTileSize });
   }
+}
 
-  row++; // leave a blank line
-
-  // print current player's top scores
+/**
+ * Draws the current player's best times.
+ * @param start_row the row from which to start printing text.
+ * @param color the color of the text.
+ * @param size the size of the text box.
+ * @param pos the location of the text.
+ */
+void ScreamyBall::DrawCurrentPlayerScores(size_t& start_row, const Color& color,
+    const ivec2& size, const ivec2& pos) {
   PrintText(kPlayerName + "'s Best Times: ", kDefaultFontSize, color, size,
-            { start_text.x, start_text.y + (++row) * kTileSize });
+            { pos.x, pos.y + (++start_row) * kTileSize });
 
   PrintText("Score - Time", kDefaultFontSize, color, size,
-            { start_text.x, start_text.y + (++row) * kTileSize });
+            { pos.x, pos.y + (++start_row) * kTileSize });
 
   for (const Player& player : current_player_top_scores_) {
-    PrintText(elapsed_time_, kDefaultFontSize, color, size,
-        { start_text.x,start_text.y + (++row) * kTileSize} );
+    PrintText(player.elapsed_time, kDefaultFontSize, color, size,
+              { pos.x,pos.y + (++start_row) * kTileSize} );
   }
 }
 

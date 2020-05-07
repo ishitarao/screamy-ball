@@ -73,6 +73,10 @@ class ScreamyBall : public cinder::app::App {
   void DrawObstacles();
   void DrawGameOver();
   void DrawLeaderboard();
+  void DrawTopPlayerScores(size_t& start_row, const cinder::Color& color,
+                           const ivec2& size, const ivec2& pos);
+  void DrawCurrentPlayerScores(size_t& start_row, const cinder::Color& color,
+                               const ivec2& size, const ivec2& pos);
   void DrawConfirmReset();
 
   void RecognizeCommands(const std::string& message);
